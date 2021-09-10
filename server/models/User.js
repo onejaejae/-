@@ -4,13 +4,16 @@ const userSchema = new mongoose.Schema(
   {
     nickname: {
       type: String,
+      required: false,
       unique: 1,
     },
 
-    refreshToken: {
-      type: String,
-      required: true,
-    },
+    // refreshToken: {
+    //   type: String,
+    //   required: true,
+    // },
+
+    kakaoId: Number,
   },
 
   { timestamps: true }

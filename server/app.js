@@ -1,3 +1,5 @@
+import "./passport";
+import passport from "passport";
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
@@ -12,6 +14,9 @@ const createServer = () => {
 
   const { PORT } = process.env;
 
+  // passport
+  app.use(passport.initialize());
+
   app.set("port", PORT || 4000);
   app.use(responseTime());
   app.use(morgan("dev"));
@@ -23,7 +28,7 @@ const createServer = () => {
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
     // console.error(err.message);
-    res.status(err.status || 5000);
+    res.status(err.status || 500);
     res.json({ success: false, message: err.message });
   });
 
