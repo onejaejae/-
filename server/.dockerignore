@@ -1,0 +1,4 @@
+node_modules
+.gitignore
+bogobogo.pem
+package-lock.json

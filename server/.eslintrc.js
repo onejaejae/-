@@ -16,5 +16,6 @@ module.exports = {
     "no-else-return": "off",
     "consistent-return": "off",
     "import/named": "off",
+    "import/no-mutable-exports": "off",
   },
 };
