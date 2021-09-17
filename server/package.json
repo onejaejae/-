@@ -18,6 +18,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.7",
     "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-kakao": "^1.0.1",
@@ -25,7 +26,6 @@
     "response-time": "^2.3.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7",
     "@babel/core": "^7.15.5",
     "@babel/node": "^7.15.4",
     "@babel/preset-env": "^7.15.4",
@@ -34,6 +34,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-prettier": "^4.0.0",
+    "nodemon": "^2.0.7",
     "prettier": "^2.3.2"
   }
 }

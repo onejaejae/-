@@ -6,6 +6,7 @@ import {
   postKakaoLogin,
   editProfile,
   getRefresh,
+  getJwt,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 
@@ -16,11 +17,15 @@ const { NODE_ENV, CLIENT_HOME_URL_DEV, CLIENT_HOME_URL_PRO } = process.env;
 // 권한 test용
 userRouter.get("/profile", authJWT, editProfile);
 
+// third party access token 인증, jwt 생성
+userRouter.get(userRoutes.jwt, getJwt);
+
 // kakao
 userRouter.get(
   userRoutes.kakaoStart,
   passport.authenticate("kakao", { session: false })
 );
+
 userRouter.get(
   userRoutes.kakaoFinish,
   passport.authenticate("kakao", {

@@ -9,9 +9,12 @@ https://velog.io/@kshired/Express%EC%97%90%EC%84%9C-JWT%EB%A1%9C-%EC%9D%B8%EC%A6
 
 ### best practice
 ---
+
 <br>
 
 https://github.com/goldbergyoni/nodebestpractices#2-error-handling-practices
+
+https://goldbergyoni.com/checklist-best-practices-of-node-js-error-handling/ (오류처리)
 
 <br>
 
@@ -40,3 +43,17 @@ https://blog.ull.im/engineering/2019/03/31/node-js-production-best-practices.htm
 <br>
 
 https://velog.io/@nawnoes/nodejs-express.js-%EC%84%9C%EB%B2%84-babel-node%EC%99%80-pm2%EB%A1%9C-%EA%B8%B0%EB%8F%99%ED%95%98%EA%B8%B0
+
+
+<br>
+
+### node cluster
+---
+
+<br>
+
+http://labs.brandi.co.kr/2018/05/25/kangww.html
+
+https://engineering.linecorp.com/ko/blog/pm2-nodejs/
+
+

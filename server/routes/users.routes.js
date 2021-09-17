@@ -11,6 +11,9 @@ const LOGOUT = "/logout";
 const KAKAO_START = "/kakao/start";
 const KAKAO_FINISH = "/kakao/finish";
 
+// jwt
+const JWT = "/jwt";
+
 // refresh
 const REFRESH = "/refresh";
 
@@ -21,6 +24,7 @@ const userRoutes = {
   kakaoStart: KAKAO_START,
   kakaoFinish: KAKAO_FINISH,
   refresh: REFRESH,
+  jwt: JWT,
 };
 
 export default userRoutes;

@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    nickname: {
-      type: String,
-      required: false,
-      unique: 1,
-    },
+    // nickname: {
+    //   type: String,
+    //   required: false,
+    //   unique: 1,
+    // },
 
     // refreshToken: {
     //   type: String,
@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema(
     // },
 
     kakaoId: Number,
+    facebookId: Number,
+    googleId: Number,
+    naverId: String,
   },
 
   { timestamps: true }

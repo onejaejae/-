@@ -1,10 +1,12 @@
 import jwt from "jsonwebtoken";
 import redisClient from "../utils/redis";
 import throwError from "../utils/throwError";
+import tokenApi from "../utils/tokenApi";
 import User from "../models/User";
+import userExist from "../utils/userExist";
 import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
 
-// const { KAKAO_CLIENT_ID, KAKAO_SECRET, KAKAO_REDIRECT_URL } = process.env;
+const { FACEBOOK_ID } = process.env;
 
 export const getLogout = (req, res, next) => {
   try {
@@ -18,7 +20,7 @@ export const getLogout = (req, res, next) => {
 };
 
 // refresh
-export const getRefresh = (req, res, next) => {
+export const getRefresh = async (req, res, next) => {
   try {
     // access token과 refresh token의 존재 유무를 체크합니다.
     if (req.headers.authorization && req.headers.refresh) {
@@ -38,7 +40,8 @@ export const getRefresh = (req, res, next) => {
 
       /* access token의 decoding 된 값에서
       유저의 id를 가져와 refresh token을 검증합니다. */
-      const refreshResult = refreshVerify(refreshToken, decoded.id);
+      const refreshResult = await refreshVerify(refreshToken, decoded.id);
+      console.log(refreshResult);
 
       // 재발급을 위해서는 access token이 만료되어 있어야합니다.
       if (
@@ -71,6 +74,153 @@ export const getRefresh = (req, res, next) => {
       // access token 또는 refresh token이 헤더에 없는 경우
       return next(throwError(400, "Access token, refresh token이 필요합니다."));
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// jwt
+export const getJwt = async (req, res, next) => {
+  try {
+    const { provider } = req.query;
+    const accessToken = req.headers.authorization.split("Bearer ")[1];
+    const userObj = {};
+    let Tokendata;
+    let userData;
+    let user;
+
+    switch (provider) {
+      case "kakao":
+        Tokendata = await tokenApi(
+          "https://kapi.kakao.com/v1/user/access_token_info",
+          accessToken
+        );
+        break;
+
+      case "naver":
+        Tokendata = await tokenApi(
+          "https://openapi.naver.com/v1/nid/verify",
+          accessToken
+        );
+        break;
+
+      case "google":
+        try {
+          Tokendata = await tokenApi(
+            `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`
+          );
+        } catch (error) {
+          next(error);
+        }
+        break;
+
+      case "facebook":
+        try {
+          Tokendata = await tokenApi(
+            `https://graph.facebook.com/debug_token?
+            input_token=${accessToken}
+            &access_token=${FACEBOOK_ID}`
+          );
+        } catch (error) {
+          next(error);
+        }
+        break;
+
+      default:
+        return next(throwError(400, "잘못된 provider입니다."));
+    }
+
+    if (Tokendata.status !== 200) {
+      next(throwError(400, "토큰이 유효하지 않습니다."));
+    }
+
+    switch (provider) {
+      case "kakao":
+        userData = await (
+          await tokenApi("https://kapi.kakao.com/v2/user/me", accessToken)
+        ).json();
+
+        userObj.kakaoId = userData.id;
+        user = await userExist(userObj);
+
+        if (!user) {
+          user = await User.create({
+            kakaoId: userData.id,
+          });
+        }
+        break;
+
+      case "naver":
+        userData = await (
+          await tokenApi("https://openapi.naver.com/v1/nid/me", accessToken)
+        ).json();
+
+        userObj.naverId = userData.response.id;
+        user = await userExist(userObj);
+
+        if (!user) {
+          user = await User.create({
+            naverId: userData.response.id,
+          });
+        }
+        break;
+
+      case "google":
+        try {
+          userData = await (
+            await tokenApi(
+              `https://www.googleapis.com/oauth2/v2/userinfo`,
+              accessToken
+            )
+          ).json();
+
+          userObj.googleId = userData.id;
+          user = await userExist(userObj);
+
+          if (!user) {
+            user = await User.create({
+              googleId: userData.id,
+            });
+          }
+        } catch (error) {
+          next(error);
+        }
+        break;
+
+      case "facebook":
+        try {
+          userData = await (
+            await tokenApi(
+              `https://graph.facebook.com/me?access_token=${accessToken}`
+            )
+          ).json();
+
+          userObj.facebookId = userData.id;
+          user = await userExist(userObj);
+
+          if (!user) {
+            user = await User.create({
+              facebookId: userData.id,
+            });
+          }
+        } catch (error) {
+          next(error);
+        }
+        break;
+
+      default:
+        return next(throwError(400, "잘못된 provider입니다."));
+    }
+
+    // jwt 발급
+    const AccessToken = sign(user);
+    const RefreshToken = refresh();
+
+    redisClient.set(user.id, RefreshToken);
+
+    res
+      .status(200)
+      .json({ success: true, data: { AccessToken, RefreshToken } });
   } catch (error) {
     next(error);
   }
