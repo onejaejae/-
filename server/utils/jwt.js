@@ -40,7 +40,7 @@ export const refresh = () => {
   return jwt.sign({}, JWT_SECRET, {
     // refresh token은 payload 없이 발급
     algorithm: "HS256",
-    expiresIn: "50w",
+    expiresIn: "365d",
   });
 };
 

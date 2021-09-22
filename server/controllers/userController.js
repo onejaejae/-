@@ -5,19 +5,9 @@ import tokenApi from "../utils/tokenApi";
 import User from "../models/User";
 import userExist from "../utils/userExist";
 import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
+import logger from "../config/logger";
 
 const { FACEBOOK_ID } = process.env;
-
-export const getLogout = (req, res, next) => {
-  try {
-    if (!req.session.loggedIn) return next(throwError(400, "권한이 없습니다."));
-
-    req.session.destroy();
-    res.status(200).json({ success: true });
-  } catch (error) {
-    next(error);
-  }
-};
 
 // refresh
 export const getRefresh = async (req, res, next) => {
@@ -41,7 +31,6 @@ export const getRefresh = async (req, res, next) => {
       /* access token의 decoding 된 값에서
       유저의 id를 가져와 refresh token을 검증합니다. */
       const refreshResult = await refreshVerify(refreshToken, decoded.id);
-      console.log(refreshResult);
 
       // 재발급을 위해서는 access token이 만료되어 있어야합니다.
       if (
@@ -53,9 +42,9 @@ export const getRefresh = async (req, res, next) => {
           return next(throwError(401, "새로 로그인 해주세요."));
         } else {
           // 2. access token이 만료되고, refresh token은 만료되지 않은 경우 => 새로운 access token을 발급
-
-          console.log(decoded);
           const newAccessToken = sign(decoded);
+
+          logger.info(`GET /refresh 200 Response: "success: true"`);
 
           res.status(200).json({
             // 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
@@ -83,6 +72,11 @@ export const getRefresh = async (req, res, next) => {
 export const getJwt = async (req, res, next) => {
   try {
     const { provider } = req.query;
+
+    if (!req.headers.authorization) {
+      return next(throwError(400, "header에 accessToken이 없습니다."));
+    }
+
     const accessToken = req.headers.authorization.split("Bearer ")[1];
     const userObj = {};
     let Tokendata;
@@ -218,6 +212,8 @@ export const getJwt = async (req, res, next) => {
 
     redisClient.set(user.id, RefreshToken);
 
+    logger.info(`GET /jwt 200 Response: "success: true"`);
+
     res
       .status(200)
       .json({ success: true, data: { AccessToken, RefreshToken } });
@@ -226,47 +222,8 @@ export const getJwt = async (req, res, next) => {
   }
 };
 
-// kakao
-
-export const kakaoLoginCallback = async (
-  accessToken,
-  refreshToken,
-  profile,
-  done
-) => {
-  try {
-    const {
-      _json: { id: kakaoId },
-    } = profile;
-
-    let user = await User.findOne({ kakaoId });
-    const token = {};
-
-    if (!user) {
-      user = await User.create({
-        kakaoId,
-      });
-    }
-
-    const AccessToken = sign(user);
-    const RefreshToken = refresh();
-
-    token.accessToken = AccessToken;
-    token.refreshToken = RefreshToken;
-
-    redisClient.set(user.id, RefreshToken);
-
-    done(null, token);
-  } catch (error) {
-    console.error("error", error);
-    return done(error);
-  }
-};
-
-export const postKakaoLogin = (req, res) => {
-  res.status(200).json({ success: true, data: req.user });
-};
-
+// test용
 export const editProfile = (req, res) => {
+  console.log(req.id);
   res.send("권한 있다.");
 };

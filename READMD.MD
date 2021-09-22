@@ -57,3 +57,14 @@ http://labs.brandi.co.kr/2018/05/25/kangww.html
 https://engineering.linecorp.com/ko/blog/pm2-nodejs/
 
 
+<br>
+
+### winson daily rotate
+
+---
+
+<br>
+
+실서비스 구현 시 log를 daily별로 관리하는 것이 바람직하므로 daily rotate 라이브러리 사용 권장
+
+https://velog.io/@broccoliindb/winston-%EA%B3%BC-winston-daily-rotate-file-%EC%82%AC%EC%9A%A9%EB%B2%95
