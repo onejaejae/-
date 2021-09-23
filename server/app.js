@@ -16,7 +16,13 @@ const createServer = () => {
   app.set("port", PORT || 4000);
   app.use(responseTime());
   app.use(morgan("dev"));
-  app.use(express.json());
+
+  // request entity too large 해결 위해
+  app.use(
+    express.json({
+      limit: "50mb",
+    })
+  );
 
   // 라우팅
   app.use(userRoutes.user, userRouter);

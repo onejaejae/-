@@ -13,6 +13,22 @@ const userSchema = new mongoose.Schema(
     //   required: true,
     // },
 
+    // 좋아요 한 리뷰들
+    likeReview: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Review",
+      },
+    ],
+
+    // 업로드 한 리뷰들
+    postReview: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Review",
+      },
+    ],
+
     kakaoId: Number,
     facebookId: Number,
     googleId: Number,

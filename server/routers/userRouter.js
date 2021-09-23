@@ -1,6 +1,12 @@
 import express from "express";
 import userRoutes from "../routes/users.routes";
-import { editProfile, getRefresh, getJwt } from "../controllers/userController";
+import {
+  editProfile,
+  getRefresh,
+  getJwt,
+  postSeat,
+  getSeat,
+} from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 
 const userRouter = express.Router();
@@ -13,5 +19,9 @@ userRouter.get(userRoutes.jwt, getJwt);
 
 // access token 재발급
 userRouter.get(userRoutes.refresh, getRefresh);
+
+userRouter.post("/postSeat", postSeat);
+
+userRouter.get(userRoutes.seat, getSeat);
 
 export default userRouter;

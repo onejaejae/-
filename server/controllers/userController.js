@@ -3,6 +3,8 @@ import redisClient from "../utils/redis";
 import throwError from "../utils/throwError";
 import tokenApi from "../utils/tokenApi";
 import User from "../models/User";
+import Theater from "../models/Theater";
+import Seat from "../models/Seat";
 import userExist from "../utils/userExist";
 import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
 import logger from "../config/logger";
@@ -226,4 +228,48 @@ export const getJwt = async (req, res, next) => {
 export const editProfile = (req, res) => {
   console.log(req.id);
   res.send("권한 있다.");
+};
+
+// post seat
+export const postSeat = async (req, res, next) => {
+  try {
+    const { name, location } = req.body;
+
+    await Theater.create({
+      name,
+      location,
+    });
+
+    const result = [];
+
+    req.body.data.forEach((data) => {
+      data.forEach(async (data2) => {
+        delete data2.color;
+        data2.theaterName = name;
+
+        const seat = new Seat(data2);
+        result.push(seat);
+      });
+    });
+
+    await Seat.insertMany(result);
+    console.log("finished!!");
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSeat = async (req, res, next) => {
+  try {
+    const { theaterName } = req.query;
+    const seat = await Seat.find({ theaterName }).sort({
+      createdAt: 1,
+    });
+
+    return res.status(200).json({ success: true, data: seat });
+  } catch (error) {
+    next(error);
+  }
 };
