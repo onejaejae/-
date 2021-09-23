@@ -264,6 +264,8 @@ export const postSeat = async (req, res, next) => {
 export const getSeat = async (req, res, next) => {
   try {
     const { theaterName } = req.query;
+    console.log("theaterName", theaterName);
+
     const seat = await Seat.find({ theaterName }).sort({
       createdAt: 1,
     });
