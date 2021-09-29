@@ -3,8 +3,12 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import responseTime from "response-time";
 import userRoutes from "./routes/users.routes";
+import reviewRoutes from "./routes/review.routes";
+import showRoutes from "./routes/show.routes";
 import userRouter from "./routers/userRouter";
+import showRouter from "./routers/showRouter";
 import logger from "./config/logger";
+import reviewRouter from "./routers/ReviewRouter";
 
 dotenv.config();
 
@@ -26,6 +30,8 @@ const createServer = () => {
 
   // 라우팅
   app.use(userRoutes.user, userRouter);
+  app.use(reviewRoutes.review, reviewRouter);
+  app.use(showRoutes.show, showRouter);
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {

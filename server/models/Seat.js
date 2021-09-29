@@ -2,14 +2,21 @@ import mongoose from "mongoose";
 
 export const seatSchema = new mongoose.Schema(
   {
+    floor: {
+      type: Number,
+      required: true,
+    },
+
     theaterName: {
       type: String,
       required: true,
     },
+
     position: {
       x: Number,
       y: Number,
     },
+
     index: {
       type: Number,
     },
@@ -25,6 +32,11 @@ export const seatSchema = new mongoose.Schema(
     },
 
     section: String,
+
+    version: {
+      type: Number,
+      required: true,
+    },
   },
 
   { timestamps: true }

@@ -17,5 +17,8 @@ module.exports = {
     "consistent-return": "off",
     "import/named": "off",
     "import/no-mutable-exports": "off",
+    radix: "off",
+    "no-param-reassign": "off",
+    "import/prefer-default-export": "off",
   },
 };

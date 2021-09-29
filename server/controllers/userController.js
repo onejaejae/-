@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
+import faker from "faker";
 import redisClient from "../utils/redis";
 import throwError from "../utils/throwError";
 import tokenApi from "../utils/tokenApi";
 import User from "../models/User";
-import Theater from "../models/Theater";
 import Seat from "../models/Seat";
+import Theater from "../models/Theater";
 import userExist from "../utils/userExist";
 import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
 import logger from "../config/logger";
@@ -79,7 +80,7 @@ export const getJwt = async (req, res, next) => {
       return next(throwError(400, "header에 accessToken이 없습니다."));
     }
 
-    const accessToken = req.headers.authorization.split("Bearer ")[1];
+    const AccessToken = req.headers.authorization.split("Bearer ")[1];
     const userObj = {};
     let Tokendata;
     let userData;
@@ -89,21 +90,21 @@ export const getJwt = async (req, res, next) => {
       case "kakao":
         Tokendata = await tokenApi(
           "https://kapi.kakao.com/v1/user/access_token_info",
-          accessToken
+          AccessToken
         );
         break;
 
       case "naver":
         Tokendata = await tokenApi(
           "https://openapi.naver.com/v1/nid/verify",
-          accessToken
+          AccessToken
         );
         break;
 
       case "google":
         try {
           Tokendata = await tokenApi(
-            `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`
+            `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${AccessToken}`
           );
         } catch (error) {
           next(error);
@@ -114,7 +115,7 @@ export const getJwt = async (req, res, next) => {
         try {
           Tokendata = await tokenApi(
             `https://graph.facebook.com/debug_token?
-            input_token=${accessToken}
+            input_token=${AccessToken}
             &access_token=${FACEBOOK_ID}`
           );
         } catch (error) {
@@ -133,7 +134,7 @@ export const getJwt = async (req, res, next) => {
     switch (provider) {
       case "kakao":
         userData = await (
-          await tokenApi("https://kapi.kakao.com/v2/user/me", accessToken)
+          await tokenApi("https://kapi.kakao.com/v2/user/me", AccessToken)
         ).json();
 
         userObj.kakaoId = userData.id;
@@ -141,6 +142,8 @@ export const getJwt = async (req, res, next) => {
 
         if (!user) {
           user = await User.create({
+            nickname:
+              faker.internet.userName() + parseInt(Math.random() * 100000),
             kakaoId: userData.id,
           });
         }
@@ -148,7 +151,7 @@ export const getJwt = async (req, res, next) => {
 
       case "naver":
         userData = await (
-          await tokenApi("https://openapi.naver.com/v1/nid/me", accessToken)
+          await tokenApi("https://openapi.naver.com/v1/nid/me", AccessToken)
         ).json();
 
         userObj.naverId = userData.response.id;
@@ -156,6 +159,8 @@ export const getJwt = async (req, res, next) => {
 
         if (!user) {
           user = await User.create({
+            nickname:
+              faker.internet.userName() + parseInt(Math.random() * 100000),
             naverId: userData.response.id,
           });
         }
@@ -166,7 +171,7 @@ export const getJwt = async (req, res, next) => {
           userData = await (
             await tokenApi(
               `https://www.googleapis.com/oauth2/v2/userinfo`,
-              accessToken
+              AccessToken
             )
           ).json();
 
@@ -175,6 +180,8 @@ export const getJwt = async (req, res, next) => {
 
           if (!user) {
             user = await User.create({
+              nickname:
+                faker.internet.userName() + parseInt(Math.random() * 100000),
               googleId: userData.id,
             });
           }
@@ -187,7 +194,7 @@ export const getJwt = async (req, res, next) => {
         try {
           userData = await (
             await tokenApi(
-              `https://graph.facebook.com/me?access_token=${accessToken}`
+              `https://graph.facebook.com/me?access_token=${AccessToken}`
             )
           ).json();
 
@@ -196,6 +203,8 @@ export const getJwt = async (req, res, next) => {
 
           if (!user) {
             user = await User.create({
+              nickname:
+                faker.internet.userName() + parseInt(Math.random() * 100000),
               facebookId: userData.id,
             });
           }
@@ -209,16 +218,16 @@ export const getJwt = async (req, res, next) => {
     }
 
     // jwt 발급
-    const AccessToken = sign(user);
-    const RefreshToken = refresh();
+    const accessToken = sign(user);
+    const refreshToken = refresh();
 
-    redisClient.set(user.id, RefreshToken);
+    redisClient.set(user.id, refreshToken);
 
     logger.info(`GET /jwt 200 Response: "success: true"`);
 
     res
       .status(200)
-      .json({ success: true, data: { AccessToken, RefreshToken } });
+      .json({ success: true, data: { accessToken, refreshToken } });
   } catch (error) {
     next(error);
   }
@@ -233,7 +242,7 @@ export const editProfile = (req, res) => {
 // post seat
 export const postSeat = async (req, res, next) => {
   try {
-    const { name, location } = req.body;
+    const { name, location, floor } = req.body;
 
     await Theater.create({
       name,
@@ -242,17 +251,19 @@ export const postSeat = async (req, res, next) => {
 
     const result = [];
 
-    req.body.data.forEach((data) => {
-      data.forEach(async (data2) => {
-        delete data2.color;
-        data2.theaterName = name;
+    // req.body.data.forEach((data) => {
+    //   data.forEach(async (data2) => {
+    //     delete data2.color;
+    //     data2.theaterName = name;
+    //     data2.version = 1.0;
+    //     data2.floor = floor;
 
-        const seat = new Seat(data2);
-        result.push(seat);
-      });
-    });
+    //     const seat = new Seat(data2);
+    //     result.push(seat);
+    //   });
+    // });
 
-    await Seat.insertMany(result);
+    // await Seat.insertMany(result);
     console.log("finished!!");
 
     res.status(200).json({ success: true });
@@ -261,16 +272,97 @@ export const postSeat = async (req, res, next) => {
   }
 };
 
+// export const postSeat = async (req, res, next) => {
+//   try {
+//     const obj = {
+//       floor: "1층",
+//     };
+
+//     req.body.data.forEach((data) => {
+//       data.forEach(async (data2) => {
+//         delete data2.color;
+//         console.log(data2);
+
+//         const col = data2.column;
+//         obj[`${col}`] = [];
+//         // seat.index.push(data2.index);
+//       });
+//     });
+
+//     req.body.data.forEach((data) => {
+//       data.forEach(async (data2) => {
+//         delete data2.color;
+
+//         const col = data2.column;
+//         obj[`${col}`].push(data2.index);
+//         // seat.index.push(data2.index);
+//       });
+//     });
+
+//     res.status(200).json({ success: true, obj });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const getSeat = async (req, res, next) => {
   try {
     const { theaterName } = req.query;
-    console.log("theaterName", theaterName);
 
     const seat = await Seat.find({ theaterName }).sort({
       createdAt: 1,
     });
 
-    return res.status(200).json({ success: true, data: seat });
+    const obj = {};
+
+    seat.forEach((data) => {
+      obj[`${data.floor}`] = {};
+    });
+
+    seat.forEach((data) => {
+      const x = obj[`${data.floor}`];
+      x[`${data.section ? data.section : data.column}`] = {};
+    });
+
+    seat.forEach((data) => {
+      const x = obj[`${data.floor}`];
+      const y = x[`${data.section ? data.section : data.column}`];
+
+      if (
+        (data.tags[0] === "휠체어석" && !data.column) ||
+        (data.tags[0] === "시야제한석" && !data.column)
+      ) {
+        console.log("next");
+      } else if (!data.section) {
+        x[`${data.column}`] = [];
+      } else if (!data.column) {
+        x[`${data.section}`] = [];
+      } else {
+        y[`${data.column}`] = [];
+      }
+    });
+
+    seat.forEach((data) => {
+      const x = obj[`${data.floor}`];
+      const y = x[`${data.section ? data.section : data.column}`];
+
+      if (
+        (data.tags[0] === "휠체어석" && data.section) ||
+        (data.tags[0] === "시야제한석" && !data.column)
+      ) {
+        console.log("next");
+      } else if (data.tags[0] === "휠체어석" && !data.column) {
+        delete x[`${data.section ? data.section : data.column}`];
+      } else if (!data.section) {
+        x[`${data.column}`].push(data.index);
+      } else if (!data.column) {
+        x[`${data.section}`].push(data.index);
+      } else {
+        y[`${data.column}`].push(data.index);
+      }
+    });
+
+    return res.status(200).json({ success: true, data: obj });
   } catch (error) {
     next(error);
   }

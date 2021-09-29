@@ -76,3 +76,16 @@ https://velog.io/@broccoliindb/winston-%EA%B3%BC-winston-daily-rotate-file-%EC%8
 <br>
 
 https://loy124.tistory.com/381
+
+
+### DB 데이터 복사
+---
+https://aimb.tistory.com/173
+
+<br>
+
+### pm2 무중단
+
+
+---
+https://engineering.linecorp.com/ko/blog/pm2-nodejs/
