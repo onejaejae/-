@@ -94,8 +94,8 @@ export const postShow = async (req, res, next) => {
             prfruntime: showObj2.prfruntime,
           };
 
-          const show = new Show(variable);
-          await show.save();
+          // const show = new Show(variable);
+          // await show.save();
         }
       } catch (error) {
         console.error(error);
@@ -118,9 +118,6 @@ export const getShow = async (req, res, next) => {
     if (!genrenm) {
       return next(throwError(400, "req.query의 genrenm이 없습니다."));
     }
-    if (typeof genrenm !== "string") {
-      return next(throwError(400, "genrenm의 type는 string입니다."));
-    }
 
     const shows = await Show.find(
       showId ? { genrenm, _id: { $lt: showId } } : { genrenm }
@@ -129,6 +126,29 @@ export const getShow = async (req, res, next) => {
       .limit(10);
 
     res.status(200).json({ success: true, data: shows });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getShowDetail = async (req, res, next) => {
+  try {
+    const { mt20id } = req.params;
+
+    const { data } = await axios.get(
+      `http://www.kopis.or.kr/openApi/restful/pblprfr/${mt20id}?service=${process.env.OPENAPI_SECRET_KEY}`
+    );
+
+    const showjsonData = convert.xml2json(data, {
+      compact: true,
+      spaces: 4,
+      textFn: RemoveJsonTextAttribute,
+    });
+
+    const obj = JSON.parse(showjsonData);
+    const showObj = obj.dbs.db;
+
+    res.status(200).json({ success: true, data: showObj });
   } catch (error) {
     next(error);
   }
