@@ -9,6 +9,7 @@ import Theater from "../models/Theater";
 import userExist from "../utils/userExist";
 import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
 import logger from "../config/logger";
+import Show from "../models/Show";
 
 const { FACEBOOK_ID } = process.env;
 
@@ -266,6 +267,17 @@ export const postSeat = async (req, res, next) => {
     // await Seat.insertMany(result);
     console.log("finished!!");
 
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSeat = async (req, res, next) => {
+  try {
+    // const { fcltynm } = req.query;
+
+    // await Show.deleteMany({ fcltynm });
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);

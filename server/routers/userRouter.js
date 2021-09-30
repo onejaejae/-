@@ -6,6 +6,7 @@ import {
   getJwt,
   postSeat,
   getSeat,
+  updateSeat,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 
@@ -20,8 +21,10 @@ userRouter.get(userRoutes.jwt, getJwt);
 // access token 재발급
 userRouter.get(userRoutes.refresh, getRefresh);
 
+userRouter.get(userRoutes.seat, getSeat);
+
 userRouter.post("/postSeat", postSeat);
 
-userRouter.get(userRoutes.seat, getSeat);
+userRouter.patch("/seat", updateSeat);
 
 export default userRouter;

@@ -1,9 +1,9 @@
 import express from "express";
-import { postShow } from "../controllers/homeController";
+import { postShow, getShow } from "../controllers/homeController";
 
 const homeRouter = express.Router();
 
-// 권한 test용
-homeRouter.get("/", postShow);
+homeRouter.get("/post", postShow);
+homeRouter.get("/", getShow);
 
 export default homeRouter;

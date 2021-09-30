@@ -51,7 +51,20 @@ const showSchema = new mongoose.Schema(
       required: true,
     },
 
+    // 오픈런
     openrun: {
+      type: String,
+      required: true,
+    },
+
+    // 공연관람연령
+    prfage: {
+      type: String,
+      required: true,
+    },
+
+    // 공연 런타임
+    prfruntime: {
       type: String,
       required: true,
     },
