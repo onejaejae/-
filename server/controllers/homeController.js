@@ -139,6 +139,9 @@ export const getShowDetail = async (req, res, next) => {
       `http://www.kopis.or.kr/openApi/restful/pblprfr/${mt20id}?service=${process.env.OPENAPI_SECRET_KEY}`
     );
 
+    console.log("mt20id", mt20id);
+    console.log("data", data);
+
     const showjsonData = convert.xml2json(data, {
       compact: true,
       spaces: 4,
