@@ -5,8 +5,10 @@ import responseTime from "response-time";
 import userRoutes from "./routes/users.routes";
 import reviewRoutes from "./routes/review.routes";
 import homeRoutes from "./routes/home.routes";
+import theaterRoutes from "./routes/theater.routes";
 import userRouter from "./routers/userRouter";
 import homeRouter from "./routers/homeRouter";
+import theaterRouter from "./routers/theaterRouter";
 import logger from "./config/logger";
 import reviewRouter from "./routers/ReviewRouter";
 
@@ -32,6 +34,7 @@ const createServer = () => {
   app.use(userRoutes.user, userRouter);
   app.use(reviewRoutes.review, reviewRouter);
   app.use(homeRoutes.home, homeRouter);
+  app.use(theaterRoutes.theater, theaterRouter);
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {

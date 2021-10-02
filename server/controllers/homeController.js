@@ -73,11 +73,43 @@ export const postShow = async (req, res, next) => {
         const showObj2 = obj2.dbs.db;
 
         if (theater.includes(showObj2.fcltynm)) {
-          if (typeof showObj2.poster === "object") {
-            showObj2.poster = "null";
+          let cast = [];
+          let crew = [];
+          let seguidance = [];
+          let dtguidance = [];
+          const styurls = [];
+
+          if (typeof showObj2.prfcast !== "object") {
+            cast = showObj2.prfcast.split(",");
+            cast[cast.length - 1] = cast[cast.length - 1].replace(" 등", "");
           }
-          if (typeof showObj2.prfruntime === "object") {
-            showObj2.prfruntime = "null";
+
+          if (typeof showObj2.prfcrew !== "object") {
+            crew = showObj2.prfcrew.split(",");
+            crew[crew.length - 1] = crew[crew.length - 1].replace(" 등", "");
+          }
+
+          if (typeof showObj2.pcseguidance !== "object") {
+            seguidance = showObj2.pcseguidance.split("원");
+            seguidance.forEach((guidance, index) => {
+              seguidance[index] = guidance.replace(", ", "");
+              seguidance.splice(seguidance.length - 1);
+            });
+          }
+
+          if (typeof showObj2.dtguidance !== "object") {
+            dtguidance = showObj2.dtguidance.split(")");
+            dtguidance.splice(dtguidance.length - 1);
+            dtguidance.forEach((guidance, index) => {
+              dtguidance[index] = guidance.replace(", ", "");
+              dtguidance[index] += ")";
+            });
+          }
+
+          if (showObj2.styurls !== {}) {
+            for (const property in showObj2.styurls) {
+              styurls.push(showObj2.styurls[property]);
+            }
           }
 
           const variable = {
@@ -86,16 +118,27 @@ export const postShow = async (req, res, next) => {
             prfpdfrom: showObj2.prfpdfrom,
             prfpdto: showObj2.prfpdto,
             fcltynm: showObj2.fcltynm,
-            poster: showObj2.poster,
+            poster: typeof showObj2.poster === "object" ? "" : showObj2.poster,
             genrenm: showObj2.genrenm,
             prfstate: showObj2.prfstate,
             openrun: showObj2.openrun,
             prfage: showObj2.prfage,
-            prfruntime: showObj2.prfruntime,
+            prfruntime:
+              typeof showObj2.prfruntime === "object"
+                ? ""
+                : showObj2.prfruntime,
+            prfcast: cast,
+            prfcrew: crew,
+            pcseguidance: seguidance,
+            entrpsnm:
+              typeof showObj2.entrpsnm === "object" ? "" : showObj2.entrpsnm,
+            sty: typeof showObj2.sty === "object" ? "" : showObj2.sty,
+            dtguidance,
+            styurls,
           };
 
-          // const show = new Show(variable);
-          // await show.save();
+          const show = new Show(variable);
+          await show.save();
         }
       } catch (error) {
         console.error(error);
@@ -111,18 +154,21 @@ export const postShow = async (req, res, next) => {
 export const getShow = async (req, res, next) => {
   try {
     const { genrenm, showId } = req.query;
+    let show;
 
     if (showId && !mongoose.isValidObjectId(showId)) {
       return next(throwError(400, "showId가 유효하지 않습니다."));
+    } else if (showId && mongoose.isValidObjectId(showId)) {
+      show = await Show.findById(showId);
     }
     if (!genrenm) {
       return next(throwError(400, "req.query의 genrenm이 없습니다."));
     }
 
     const shows = await Show.find(
-      showId ? { genrenm, _id: { $lt: showId } } : { genrenm }
+      showId ? { genrenm, prfpdfrom: { $lt: show.prfpdfrom } } : { genrenm }
     )
-      .sort({ _id: -1 })
+      .sort({ prfpdfrom: -1 })
       .limit(10);
 
     res.status(200).json({ success: true, data: shows });
@@ -133,25 +179,21 @@ export const getShow = async (req, res, next) => {
 
 export const getShowDetail = async (req, res, next) => {
   try {
-    const { mt20id } = req.params;
+    const { showId } = req.params;
+    const show = await Show.findById(showId);
 
-    const { data } = await axios.get(
-      `http://www.kopis.or.kr/openApi/restful/pblprfr/${mt20id}?service=${process.env.OPENAPI_SECRET_KEY}`
-    );
+    res.status(200).json({ success: true, data: show });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    console.log("mt20id", mt20id);
-    console.log("data", data);
+export const getSearchShow = async (req, res, next) => {
+  try {
+    const show = await Show.find({ prfnm: { $regex: req.query.search } });
+    console.log(show);
 
-    const showjsonData = convert.xml2json(data, {
-      compact: true,
-      spaces: 4,
-      textFn: RemoveJsonTextAttribute,
-    });
-
-    const obj = JSON.parse(showjsonData);
-    const showObj = obj.dbs.db;
-
-    res.status(200).json({ success: true, data: showObj });
+    res.status(200).json({ success: true, data: show });
   } catch (error) {
     next(error);
   }

@@ -17,6 +17,10 @@ const theaterSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    seatNumber: {
+      type: Number,
+    },
   },
 
   { timestamps: true }

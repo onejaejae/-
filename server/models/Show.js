@@ -33,10 +33,8 @@ const showSchema = new mongoose.Schema(
     },
 
     // 포스터이미지경로
-    // poster 정보 없을 경우 string null로 저장
     poster: {
       type: String,
-      required: true,
     },
 
     // 공연 장르명
@@ -66,7 +64,46 @@ const showSchema = new mongoose.Schema(
     // 공연 런타임
     prfruntime: {
       type: String,
+    },
+
+    // 공연출연진
+    prfcast: {
+      type: Array,
       required: true,
+    },
+
+    // 공연제작진
+    prfcrew: {
+      type: Array,
+      required: true,
+    },
+
+    // 공연가격표
+    pcseguidance: {
+      type: Array,
+      required: true,
+    },
+
+    // 공연시간
+    dtguidance: {
+      type: Array,
+      required: true,
+    },
+
+    // 소개이미지목록
+    styurls: {
+      type: Array,
+      required: true,
+    },
+
+    // 제작사
+    entrpsnm: {
+      type: String,
+    },
+
+    // 줄거리
+    sty: {
+      type: String,
     },
   },
 

@@ -16,10 +16,9 @@ export const reviewSchema = new mongoose.Schema(
 
     // 어떤 극장의 리뷰인지
     // 첫 리뷰화면 이후에 댓글들을 보여주기 위해 필요
-    theaterId: {
-      type: mongoose.SchemaTypes.ObjectId,
+    theater: {
+      type: String,
       required: true,
-      ref: "blog",
     },
 
     // 뮤지컬 or 공연 제목

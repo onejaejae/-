@@ -52,9 +52,12 @@ https://velog.io/@nawnoes/nodejs-express.js-%EC%84%9C%EB%B2%84-babel-node%EC%99%
 
 <br>
 
+https://velog.io/@ckstn0777/NodeJS-%EC%84%B1%EB%8A%A5-%ED%96%A5%EC%83%81-%EB%B0%A9%EB%B2%95-2-PM2
+
 http://labs.brandi.co.kr/2018/05/25/kangww.html
 
 https://engineering.linecorp.com/ko/blog/pm2-nodejs/
+
 
 
 <br>
@@ -71,11 +74,15 @@ https://velog.io/@broccoliindb/winston-%EA%B3%BC-winston-daily-rotate-file-%EC%8
 
 <br>
 
-### docker pm2 winston
+### docker pm2 cluster
 ---
 <br>
 
 https://loy124.tistory.com/381
+
+https://jaeseokim.tistory.com/115
+
+https://armadillo-dev.github.io/javascript/nodejs/node-js-pm2/
 
 
 ### DB 데이터 복사
@@ -86,6 +93,28 @@ https://aimb.tistory.com/173
 
 ### pm2 무중단
 
+<br>
 
 ---
 https://engineering.linecorp.com/ko/blog/pm2-nodejs/
+
+
+<br>
+
+### atlas mongo dump
+
+---
+
+<br>
+
+https://realwater87.tistory.com/6
+
+ex)  
+
+✔ dump
+
+mongodump --uri "mongodb+srv://bogo:PnDlsMx8MvsCP1FC@cluster0.5gwfw.mongodb.net/BOGO" 
+
+✔ 복구
+
+mongorestore --uri "mongodb+srv://bogo:PnDlsMx8MvsCP1FC@cluster0.5gwfw.mongodb.net" --db BOGO_TEST ./dump/BOGO
