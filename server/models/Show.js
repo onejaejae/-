@@ -109,6 +109,13 @@ const showSchema = new mongoose.Schema(
     // 평균 평점
     rating: {
       type: Number,
+      default: 0,
+    },
+
+    // 총 평점
+    totalRating: {
+      type: Number,
+      default: 0,
     },
 
     reviewNumber: {

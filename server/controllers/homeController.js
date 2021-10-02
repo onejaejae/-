@@ -1,5 +1,4 @@
 import axios from "axios";
-import mongoose from "mongoose";
 import convert from "xml-js";
 import Show from "../models/Show";
 import Theater from "../models/Theater";
@@ -200,12 +199,29 @@ export const getShowDetail = async (req, res, next) => {
 
 export const getSearchMusical = async (req, res, next) => {
   try {
-    const { term, page = 0 } = req.query;
+    const { term, page = 0, sort } = req.query;
+
+    let variable = { prfnm: 1 };
+    switch (sort) {
+      case "name":
+        variable = { prfnm: 1 };
+        break;
+      case "latest":
+        variable = { prfpdfrom: -1 };
+        break;
+      case "rating":
+        variable = { rating: -1 };
+        break;
+
+      default:
+        break;
+    }
 
     const musical = await Show.find({
       genrenm: "뮤지컬",
       prfnm: { $regex: term, $options: "i" },
     })
+      .sort(variable)
       .skip(page * 10)
       .limit(10);
 
@@ -217,12 +233,29 @@ export const getSearchMusical = async (req, res, next) => {
 
 export const getSearchShow = async (req, res, next) => {
   try {
-    const { term, page = 0 } = req.query;
+    const { term, page = 0, sort } = req.query;
+
+    let variable = { prfnm: 1 };
+    switch (sort) {
+      case "name":
+        variable = { prfnm: 1 };
+        break;
+      case "latest":
+        variable = { prfpdfrom: -1 };
+        break;
+      case "rating":
+        variable = { rating: -1 };
+        break;
+
+      default:
+        break;
+    }
 
     const show = await Show.find({
       genrenm: "연극",
       prfnm: { $regex: term, $options: "i" },
     })
+      .sort(variable)
       .skip(page * 10)
       .limit(10);
 

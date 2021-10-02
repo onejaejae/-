@@ -14,22 +14,23 @@ export const reviewSchema = new mongoose.Schema(
       },
     },
 
-    // 어떤 극장의 리뷰인지
+    // 극장 이름
     // 첫 리뷰화면 이후에 댓글들을 보여주기 위해 필요
-    theater: {
+    fcltynm: {
       type: String,
       required: true,
     },
 
     // 공연 id
-    showId: {
-      type: mongoose.SchemaTypes.ObjectId,
+    mt20id: {
+      type: String,
       required: true,
     },
 
-    // 뮤지컬 or 공연 제목
-    title: {
+    // 뮤지컬 or 연극 제목
+    prfnm: {
       type: String,
+      required: true,
     },
 
     // 시야 리뷰
@@ -52,7 +53,7 @@ export const reviewSchema = new mongoose.Schema(
 
     // casting 정보
     casting: {
-      type: String,
+      type: Array,
       required: true,
     },
 

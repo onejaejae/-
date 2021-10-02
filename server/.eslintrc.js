@@ -20,5 +20,6 @@ module.exports = {
     radix: "off",
     "no-param-reassign": "off",
     "import/prefer-default-export": "off",
+    "no-dupe-keys": "off",
   },
 };
