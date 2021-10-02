@@ -31,3 +31,11 @@ export const postReview = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getReview = async (req, res, next) => {
+  try {
+    console.log();
+  } catch (error) {
+    next(error);
+  }
+};

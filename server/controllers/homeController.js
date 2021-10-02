@@ -2,6 +2,7 @@ import axios from "axios";
 import mongoose from "mongoose";
 import convert from "xml-js";
 import Show from "../models/Show";
+import Theater from "../models/Theater";
 import throwError from "../utils/throwError";
 
 const RemoveJsonTextAttribute = (value, parentElement) => {
@@ -153,22 +154,31 @@ export const postShow = async (req, res, next) => {
 
 export const getShow = async (req, res, next) => {
   try {
-    const { genrenm, showId } = req.query;
-    let show;
+    const { genrenm, page = 0, sort } = req.query;
 
-    if (showId && !mongoose.isValidObjectId(showId)) {
-      return next(throwError(400, "showId가 유효하지 않습니다."));
-    } else if (showId && mongoose.isValidObjectId(showId)) {
-      show = await Show.findById(showId);
-    }
     if (!genrenm) {
       return next(throwError(400, "req.query의 genrenm이 없습니다."));
     }
 
-    const shows = await Show.find(
-      showId ? { genrenm, prfpdfrom: { $lt: show.prfpdfrom } } : { genrenm }
-    )
-      .sort({ prfpdfrom: -1 })
+    let variable = { prfnm: 1 };
+    switch (sort) {
+      case "name":
+        variable = { prfnm: 1 };
+        break;
+      case "latest":
+        variable = { prfpdfrom: -1 };
+        break;
+      case "rating":
+        variable = { rating: -1 };
+        break;
+
+      default:
+        break;
+    }
+
+    const shows = await Show.find({ genrenm })
+      .sort(variable)
+      .skip(page * 10)
       .limit(10);
 
     res.status(200).json({ success: true, data: shows });
@@ -188,12 +198,50 @@ export const getShowDetail = async (req, res, next) => {
   }
 };
 
+export const getSearchMusical = async (req, res, next) => {
+  try {
+    const { term, page = 0 } = req.query;
+
+    const musical = await Show.find({
+      genrenm: "뮤지컬",
+      prfnm: { $regex: term, $options: "i" },
+    })
+      .skip(page * 10)
+      .limit(10);
+
+    res.status(200).json({ success: true, data: musical });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getSearchShow = async (req, res, next) => {
   try {
-    const show = await Show.find({ prfnm: { $regex: req.query.search } });
-    console.log(show);
+    const { term, page = 0 } = req.query;
+
+    const show = await Show.find({
+      genrenm: "연극",
+      prfnm: { $regex: term, $options: "i" },
+    })
+      .skip(page * 10)
+      .limit(10);
 
     res.status(200).json({ success: true, data: show });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSearchTheater = async (req, res, next) => {
+  try {
+    const { term, page = 0 } = req.query;
+    const theater = await Theater.find({
+      name: { $regex: term, $options: "i" },
+    })
+      .skip(page * 10)
+      .limit(10);
+
+    res.status(200).json({ success: true, data: theater });
   } catch (error) {
     next(error);
   }

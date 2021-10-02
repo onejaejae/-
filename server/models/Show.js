@@ -105,6 +105,17 @@ const showSchema = new mongoose.Schema(
     sty: {
       type: String,
     },
+
+    // 평균 평점
+    rating: {
+      type: Number,
+    },
+
+    reviewNumber: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
   },
 
   { timestamps: true }
