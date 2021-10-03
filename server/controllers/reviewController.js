@@ -1,7 +1,23 @@
+import mongoose from "mongoose";
 import Review from "../models/Review";
 import Theater from "../models/Theater";
 import User from "../models/User";
 import Show from "../models/Show";
+import throwError from "../utils/throwError";
+
+export const getReviewDetail = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+
+    const review = await Review.findById(reviewId);
+    res.status(200).json({ success: true, data: review });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const postReview = async (req, res, next) => {
   try {
@@ -36,6 +52,50 @@ export const postReview = async (req, res, next) => {
     ]);
 
     res.status(200).json({ success: true, review });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { mt20id } = req.query;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+    if (!mt20id) {
+      return next(throwError(400, "query에 mt20id이 없습니다."));
+    }
+    const [review, show] = await Promise.all([
+      Review.findById(reviewId),
+      Show.findOne({ mt20id }),
+    ]);
+
+    const totalRating = show.totalRating - review.rating;
+    const rating = totalRating / (show.reviewNumber - 1);
+
+    await Promise.all([
+      Review.findByIdAndDelete(reviewId),
+      User.updateOne({ _id: req.id }, { $pull: { postReview: reviewId } }),
+      Theater.updateOne(
+        { name: review.fcltynm },
+        { $inc: { reviewCount: -1 }, $pull: { review: { _id: reviewId } } }
+      ),
+      Show.updateOne(
+        { mt20id: review.mt20id },
+        {
+          rating: rating.toFixed(1),
+          totalRating,
+          $inc: {
+            reviewNumber: -1,
+          },
+        }
+      ),
+    ]);
+
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }

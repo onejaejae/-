@@ -1,4 +1,3 @@
-// review
 const REVIEW = "/review";
 
 const THEATER = "/theater";

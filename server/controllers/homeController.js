@@ -156,7 +156,7 @@ export const getShow = async (req, res, next) => {
     const { genrenm, page = 0, sort } = req.query;
 
     if (!genrenm) {
-      return next(throwError(400, "req.query의 genrenm이 없습니다."));
+      return next(throwError(400, "query에 genrenm이 없습니다."));
     }
 
     let variable = { prfnm: 1 };
