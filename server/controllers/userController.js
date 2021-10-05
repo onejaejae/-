@@ -388,32 +388,28 @@ export const getSeat = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    const [reviews] = await Promise.all([
-      Review.find({ "writer._id": req.id }),
+    await Promise.all([
       User.findByIdAndDelete(req.id),
+      Review.updateMany(
+        { "writer._id": req.id },
+        { writer: { nickname: "탈퇴 회원" } }
+      ),
+      Theater.updateMany(
+        {},
+        { "review.$[element].writer.nickname": "탈퇴 회원" },
+        { arrayFilters: [{ "element.writer._id": "615c80f9b0f04609d03d3b19" }] }
+      ),
     ]);
 
-    reviews.map(async (review) => {
-      const [showData] = await Promise.all([
-        Show.findOneAndUpdate(
-          { mt20id: review.mt20id },
-          {
-            $inc: { reviewNumber: -1, totalRating: -review.rating },
-          }
-        ),
-        Theater.findOneAndUpdate(
-          { name: review.fcltynm },
-          { $inc: { reviewCount: -1 }, $pull: { review: { _id: review.id } } }
-        ),
-      ]);
-      console.log(showData);
-    });
+    // await Theater.updateMany(
+    //   {
+    //     "review.writer": { _id: req.id },
+    //   },
+    //   { "review.$.writer": { nickname: "탈퇴 회원" } }
+    // );
 
-    await Review.updateMany(
-      { likes: req.id },
-      { $pull: { likes: req.id }, $inc: { likeNumber: -1 } }
-    );
-    await Review.deleteMany({ "writer._id": req.id });
+    // const theater = await Theater.findOne({ "review.writer._id": req.id });
+    // console.log(theater);
 
     redisClient.del(req.id);
     res.status(200).json({ success: true });
