@@ -7,24 +7,23 @@ import {
   getSearchShow,
   getSearchTheater,
 } from "../controllers/homeController";
+import authJWT from "../middlewares/authJWT";
 import homeRoutes from "../routes/home.routes";
 
 const homeRouter = express.Router();
 
+// 공연 리스트
+homeRouter.get("/", authJWT, getShow);
+// 뮤지컬 검색
+homeRouter.get(homeRoutes.musicalSearch, authJWT, getSearchMusical);
+// 연극 검색
+homeRouter.get(homeRoutes.showSearch, authJWT, getSearchShow);
+// 극장 검색
+homeRouter.get(homeRoutes.theaterSearch, authJWT, getSearchTheater);
+// 공연 상세 페이지
+homeRouter.get("/:showId", authJWT, getShowDetail);
+
 // db 저장용
 homeRouter.get("/post", postShow);
-
-// 공연 리스트
-homeRouter.get("/", getShow);
-
-// 뮤지컬 검색
-homeRouter.get(homeRoutes.musicalSearch, getSearchMusical);
-// 연극 검색
-homeRouter.get(homeRoutes.showSearch, getSearchShow);
-// 극장 검색
-homeRouter.get(homeRoutes.theaterSearch, getSearchTheater);
-
-// 공연 상세 페이지
-homeRouter.get("/:showId", getShowDetail);
 
 export default homeRouter;

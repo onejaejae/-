@@ -7,8 +7,9 @@ import User from "../models/User";
 import Seat from "../models/Seat";
 import Theater from "../models/Theater";
 import userExist from "../utils/userExist";
-import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
+import { verify, sign, refresh, refreshVerify, logoutSign } from "../utils/jwt";
 import logger from "../config/logger";
+import Review from "../models/Review";
 import Show from "../models/Show";
 
 const { FACEBOOK_ID } = process.env;
@@ -234,10 +235,15 @@ export const getJwt = async (req, res, next) => {
   }
 };
 
-// test용
-export const editProfile = (req, res) => {
-  console.log(req.id);
-  res.send("권한 있다.");
+export const getLogout = async (req, res, next) => {
+  try {
+    redisClient.del(req.id);
+    const accessToken = logoutSign();
+
+    res.status(200).json({ success: true, accessToken });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // post seat
@@ -375,6 +381,42 @@ export const getSeat = async (req, res, next) => {
     });
 
     return res.status(200).json({ success: true, data: obj });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const [reviews] = await Promise.all([
+      Review.find({ "writer._id": req.id }),
+      User.findByIdAndDelete(req.id),
+    ]);
+
+    reviews.map(async (review) => {
+      const [showData] = await Promise.all([
+        Show.findOneAndUpdate(
+          { mt20id: review.mt20id },
+          {
+            $inc: { reviewNumber: -1, totalRating: -review.rating },
+          }
+        ),
+        Theater.findOneAndUpdate(
+          { name: review.fcltynm },
+          { $inc: { reviewCount: -1 }, $pull: { review: { _id: review.id } } }
+        ),
+      ]);
+      console.log(showData);
+    });
+
+    await Review.updateMany(
+      { likes: req.id },
+      { $pull: { likes: req.id }, $inc: { likeNumber: -1 } }
+    );
+    await Review.deleteMany({ "writer._id": req.id });
+
+    redisClient.del(req.id);
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }

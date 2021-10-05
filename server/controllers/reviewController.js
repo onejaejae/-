@@ -57,6 +57,22 @@ export const postReview = async (req, res, next) => {
   }
 };
 
+export const patchReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+
+    const updateReview = await Review.findByIdAndUpdate(reviewId, req.body, {
+      new: true,
+    });
+    res.status(200).json({ success: true, data: updateReview });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteReview = async (req, res, next) => {
   try {
     const { reviewId } = req.params;
@@ -96,6 +112,56 @@ export const deleteReview = async (req, res, next) => {
     ]);
 
     res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchLike = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+
+    const [updateReview] = await Promise.all([
+      Review.findByIdAndUpdate(
+        reviewId,
+        {
+          $inc: { likeNumber: 1 },
+          $addToSet: { likes: req.id },
+        },
+        { new: true }
+      ),
+      User.findByIdAndUpdate(req.id, { $addToSet: { likeReview: reviewId } }),
+    ]);
+
+    res.status(200).json({ success: true, data: updateReview });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchUnlike = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+
+    const [updateReview] = await Promise.all([
+      Review.findByIdAndUpdate(
+        reviewId,
+        {
+          $inc: { likeNumber: -1 },
+          $pull: { likes: req.id },
+        },
+        { new: true }
+      ),
+      User.findByIdAndUpdate(req.id, { $pull: { likeReview: reviewId } }),
+    ]);
+
+    res.status(200).json({ success: true, data: updateReview });
   } catch (error) {
     next(error);
   }

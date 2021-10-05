@@ -11,12 +11,21 @@ export const sign = (user) => {
   const payload = {
     // access token에 들어갈 payload
     id: user.id,
+    nickname: user.nickname,
   };
 
   return jwt.sign(payload, JWT_SECRET, {
     // secret으로 sign하여 발급하고 return
     algorithm: "HS256", // 암호화 알고리즘
     expiresIn: "30m", // 유효기간
+  });
+};
+
+export const logoutSign = () => {
+  return jwt.sign({}, JWT_SECRET, {
+    // secret으로 sign하여 발급하고 return
+    algorithm: "HS256", // 암호화 알고리즘
+    expiresIn: "10", // 유효기간
   });
 };
 
