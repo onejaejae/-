@@ -6,6 +6,8 @@ import {
   getSearchMusical,
   getSearchShow,
   getSearchTheater,
+  patchScrap,
+  patchUnScrap,
 } from "../controllers/homeController";
 import authJWT from "../middlewares/authJWT";
 import homeRoutes from "../routes/home.routes";
@@ -22,6 +24,9 @@ homeRouter.get(homeRoutes.showSearch, authJWT, getSearchShow);
 homeRouter.get(homeRoutes.theaterSearch, authJWT, getSearchTheater);
 // 공연 상세 페이지
 homeRouter.get("/:showId", authJWT, getShowDetail);
+
+homeRouter.patch(`/:showId${homeRoutes.scrap}`, authJWT, patchScrap);
+homeRouter.patch(`/:showId${homeRoutes.unScrap}`, authJWT, patchUnScrap);
 
 // db 저장용
 homeRouter.get("/post", postShow);

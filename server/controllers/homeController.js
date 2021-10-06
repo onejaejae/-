@@ -1,7 +1,9 @@
 import axios from "axios";
 import convert from "xml-js";
+import mongoose from "mongoose";
 import Show from "../models/Show";
 import Theater from "../models/Theater";
+import User from "../models/User";
 import throwError from "../utils/throwError";
 
 const RemoveJsonTextAttribute = (value, parentElement) => {
@@ -275,6 +277,44 @@ export const getSearchTheater = async (req, res, next) => {
       .limit(10);
 
     res.status(200).json({ success: true, data: theater });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchScrap = async (req, res, next) => {
+  try {
+    const { showId } = req.params;
+    if (!mongoose.isValidObjectId(showId)) {
+      return next(throwError(400, "showId가 유효하지 않습니다."));
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.id,
+      {
+        $push: { scrapShow: { $each: [showId], $slice: -10 } },
+      },
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchUnScrap = async (req, res, next) => {
+  try {
+    const { showId } = req.params;
+    if (!mongoose.isValidObjectId(showId)) {
+      return next(throwError(400, "showId가 유효하지 않습니다."));
+    }
+
+    await User.findByIdAndUpdate(req.id, {
+      $pull: { scrapShow: showId },
+    });
+
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }

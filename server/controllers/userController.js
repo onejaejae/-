@@ -245,6 +245,9 @@ export const getLogout = async (req, res, next) => {
 
 export const getActivity = async (req, res, next) => {
   try {
+    // todo
+    // 각 필드마다 slice 적용
+
     const { type } = req.query;
     if (!type) {
       return next(throwError(400, "quey에 type이 없습니다."));
@@ -423,6 +426,17 @@ export const getSeat = async (req, res, next) => {
     });
 
     return res.status(200).json({ success: true, data: obj });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchProfile = async (req, res, next) => {
+  try {
+    // todo
+    // update logic
+    // s3 setting
+    console.log("");
   } catch (error) {
     next(error);
   }

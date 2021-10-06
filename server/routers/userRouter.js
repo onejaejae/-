@@ -10,6 +10,7 @@ import {
   deleteUser,
   getActivity,
   getProfile,
+  patchProfile,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 
@@ -27,6 +28,8 @@ userRouter.get(userRoutes.logout, authJWT, getLogout);
 userRouter.get(userRoutes.activity, authJWT, getActivity);
 
 userRouter.get(userRoutes.profile, authJWT, getProfile);
+
+userRouter.patch(userRoutes.profile, authJWT, patchProfile);
 
 userRouter.delete("/", authJWT, deleteUser);
 

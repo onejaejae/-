@@ -40,7 +40,10 @@ export const postReview = async (req, res, next) => {
           $push: { review: { $each: [newReview], $slice: -10 } },
         }
       ),
-      User.updateOne({ _id: req.id }, { $push: { postReview: newReview.id } }),
+      User.updateOne(
+        { _id: req.id },
+        { $push: { postReview: { $each: [newReview.id], $slice: -10 } } }
+      ),
       Show.updateOne(
         { mt20id },
         {
@@ -133,7 +136,9 @@ export const patchLike = async (req, res, next) => {
         },
         { new: true }
       ),
-      User.findByIdAndUpdate(req.id, { $addToSet: { likeReview: reviewId } }),
+      User.findByIdAndUpdate(req.id, {
+        $push: { likeReview: { $each: [reviewId], slice: -10 } },
+      }),
     ]);
 
     res.status(200).json({ success: true, data: updateReview });
