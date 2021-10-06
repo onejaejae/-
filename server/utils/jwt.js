@@ -21,14 +21,6 @@ export const sign = (user) => {
   });
 };
 
-export const logoutSign = () => {
-  return jwt.sign({}, JWT_SECRET, {
-    // secret으로 sign하여 발급하고 return
-    algorithm: "HS256", // 암호화 알고리즘
-    expiresIn: "10", // 유효기간
-  });
-};
-
 export const verify = (token) => {
   let decoded = null;
   try {

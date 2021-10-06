@@ -90,7 +90,7 @@ export const reviewSchema = new mongoose.Schema(
     },
 
     // 리뷰 좋아요
-    likes: [{ type: mongoose.Types.ObjectId }],
+    // likes: [{ type: mongoose.Types.ObjectId }],
 
     // 재방문여부
     isRevist: {

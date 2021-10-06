@@ -7,7 +7,7 @@ import User from "../models/User";
 import Seat from "../models/Seat";
 import Theater from "../models/Theater";
 import userExist from "../utils/userExist";
-import { verify, sign, refresh, refreshVerify, logoutSign } from "../utils/jwt";
+import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
 import logger from "../config/logger";
 import Review from "../models/Review";
 import Show from "../models/Show";
@@ -56,7 +56,6 @@ export const getRefresh = async (req, res, next) => {
             success: true,
             data: {
               accessToken: newAccessToken,
-              refreshToken,
             },
           });
         }
@@ -238,9 +237,7 @@ export const getJwt = async (req, res, next) => {
 export const getLogout = async (req, res, next) => {
   try {
     redisClient.del(req.id);
-    const accessToken = logoutSign();
-
-    res.status(200).json({ success: true, accessToken });
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }
