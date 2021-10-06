@@ -243,6 +243,51 @@ export const getLogout = async (req, res, next) => {
   }
 };
 
+export const getActivity = async (req, res, next) => {
+  try {
+    const { type } = req.query;
+    if (!type) {
+      return next(throwError(400, "quey에 type이 없습니다."));
+    }
+
+    let user;
+    switch (type) {
+      case "write":
+        user = await User.findById(req.id, { postReview: 1 })
+          .populate("postReview")
+          .limit(1);
+        break;
+      case "like":
+        user = await User.findById(req.id, { likeReview: 1 }).populate(
+          "likeReview"
+        );
+        break;
+
+      case "scrap":
+        user = await User.findById(req.id, { scrapShow: 1 }).populate(
+          "scrapShow"
+        );
+        break;
+
+      default:
+        return next(throwError(400, "quey의 key값이 올바르지 않습니다."));
+    }
+
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.id, { nickname: 1, avatarUrl: 1 });
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // post seat
 export const postSeat = async (req, res, next) => {
   try {

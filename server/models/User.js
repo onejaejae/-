@@ -24,6 +24,14 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
+    // 눈 여겨본 공연들
+    scrapShow: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Show",
+      },
+    ],
+
     avatarUrl: String,
 
     kakaoId: Number,
