@@ -473,24 +473,27 @@ export const getSeat = async (req, res, next) => {
 
 export const patchProfile = async (req, res, next) => {
   try {
+    const {
+      file,
+      file: { key },
+    } = req;
     let updateUser;
 
-    if (!req.file) {
+    if (!file) {
       const user = await User.findById(req.id);
       s3.deleteObject({ Bucket: "bogobogo", Key: user.key }, (error, data) => {
         if (error) throw error;
       });
 
       const variable = req.body;
-      variable.key = "";
-
       updateUser = await User.findByIdAndUpdate(req.id, variable, {
         new: true,
       });
     } else {
       const variable = req.body;
-      variable.key = req.file.key;
-      variable.avatarUrl = req.file.location;
+      variable.avatarUrl = `https://bogobogo.s3.ap-northeast-2.amazonaws.com/w140/${
+        key.split("/")[1]
+      }`;
 
       updateUser = await User.findByIdAndUpdate(req.id, variable, {
         new: true,
