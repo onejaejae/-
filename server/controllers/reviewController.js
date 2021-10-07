@@ -132,7 +132,7 @@ export const patchLike = async (req, res, next) => {
         reviewId,
         {
           $inc: { likeNumber: 1 },
-          $addToSet: { likes: req.id },
+          $push: { likes: { userId: req.id, createAt: Date.now() } },
         },
         { new: true }
       ),
@@ -159,7 +159,7 @@ export const patchUnlike = async (req, res, next) => {
         reviewId,
         {
           $inc: { likeNumber: -1 },
-          $pull: { likes: req.id },
+          $pull: { likes: { userId: req.id } },
         },
         { new: true }
       ),

@@ -294,19 +294,20 @@ export const getActivityList = async (req, res, next) => {
     let data;
     switch (type) {
       case "write":
-        data = await Review.find({ "writer._id": req.id })
+        data = await Review.find({ "writer._id": req.id }, { likes: 0 })
           .sort({ createAt: -1 })
           .skip(page * 10)
           .limit(10);
         break;
       case "like":
-        data = await Review.find({ likes: req.id })
+        data = await Review.find({ "likes.userId": req.id }, { likes: 0 })
+          .sort({ "scraps.createAt": -1 })
           .skip(page * 10)
           .limit(10);
         break;
 
       case "scrap":
-        data = await Show.find({ "scraps.userId": req.id })
+        data = await Show.find({ "scraps.userId": req.id }, { scraps: 0 })
           .sort({ "scraps.createAt": -1 })
           .skip(page * 10)
           .limit(10);
