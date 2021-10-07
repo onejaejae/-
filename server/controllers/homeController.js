@@ -289,13 +289,22 @@ export const patchScrap = async (req, res, next) => {
       return next(throwError(400, "showId가 유효하지 않습니다."));
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.id,
-      {
-        $push: { scrapShow: { $each: [showId], $slice: -10 } },
-      },
-      { new: true }
-    );
+    const [user] = await Promise.all([
+      User.findByIdAndUpdate(
+        req.id,
+        {
+          $push: { scrapShow: { $each: [showId], $slice: -10 } },
+        },
+        { new: true }
+      ),
+      Show.findByIdAndUpdate(
+        showId,
+        {
+          $push: { scraps: { userId: req.id, createAt: Date.now() } },
+        },
+        { new: true }
+      ),
+    ]);
 
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -310,9 +319,14 @@ export const patchUnScrap = async (req, res, next) => {
       return next(throwError(400, "showId가 유효하지 않습니다."));
     }
 
-    await User.findByIdAndUpdate(req.id, {
-      $pull: { scrapShow: showId },
-    });
+    await Promise.all([
+      User.findByIdAndUpdate(req.id, {
+        $pull: { scrapShow: showId },
+      }),
+      Show.findByIdAndUpdate(showId, {
+        $pull: { scraps: { userId: req.id } },
+      }),
+    ]);
 
     res.status(200).json({ success: true });
   } catch (error) {

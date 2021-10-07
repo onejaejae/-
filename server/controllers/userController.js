@@ -256,9 +256,9 @@ export const getActivity = async (req, res, next) => {
     let user;
     switch (type) {
       case "write":
-        user = await User.findById(req.id, { postReview: 1 })
-          .populate("postReview")
-          .limit(1);
+        user = await User.findById(req.id, { postReview: 1 }).populate(
+          "postReview"
+        );
         break;
       case "like":
         user = await User.findById(req.id, { likeReview: 1 }).populate(
@@ -276,7 +276,47 @@ export const getActivity = async (req, res, next) => {
         return next(throwError(400, "quey의 key값이 올바르지 않습니다."));
     }
 
+    console.log(user);
+
     res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getActivityList = async (req, res, next) => {
+  try {
+    const { page = 0, type } = req.query;
+    if (!type) {
+      return next(throwError(400, "query에 type이 없습니다."));
+    }
+
+    let data;
+    switch (type) {
+      case "write":
+        data = await Review.find({ "writer._id": req.id })
+          .sort({ createAt: -1 })
+          .skip(page * 10)
+          .limit(10);
+        break;
+      case "like":
+        data = await Review.find({ likes: req.id })
+          .skip(page * 10)
+          .limit(10);
+        break;
+
+      case "scrap":
+        data = await Show.find({ "scraps.userId": req.id })
+          .sort({ "scraps.createAt": -1 })
+          .skip(page * 10)
+          .limit(10);
+        break;
+
+      default:
+        return next(throwError(400, "query의 key값이 올바르지 않습니다."));
+    }
+
+    res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
   }

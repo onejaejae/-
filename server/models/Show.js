@@ -123,6 +123,10 @@ const showSchema = new mongoose.Schema(
       default: 0,
       required: true,
     },
+
+    scraps: [
+      { userId: { type: mongoose.Types.ObjectId }, createAt: { type: Date } },
+    ],
   },
 
   { timestamps: true }
