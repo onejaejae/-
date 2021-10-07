@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema(
     ],
 
     avatarUrl: String,
+    // avatarUrl key
+    key: String,
 
     kakaoId: Number,
     facebookId: Number,

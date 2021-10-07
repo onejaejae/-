@@ -11,6 +11,7 @@ import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
 import logger from "../config/logger";
 import Review from "../models/Review";
 import Show from "../models/Show";
+import { s3 } from "../aws";
 
 const { FACEBOOK_ID } = process.env;
 
@@ -472,10 +473,31 @@ export const getSeat = async (req, res, next) => {
 
 export const patchProfile = async (req, res, next) => {
   try {
-    // todo
-    // update logic
-    // s3 setting
-    console.log("");
+    let updateUser;
+
+    if (!req.file) {
+      const user = await User.findById(req.id);
+      s3.deleteObject({ Bucket: "bogobogo", Key: user.key }, (error, data) => {
+        if (error) throw error;
+      });
+
+      const variable = req.body;
+      variable.key = "";
+
+      updateUser = await User.findByIdAndUpdate(req.id, variable, {
+        new: true,
+      });
+    } else {
+      const variable = req.body;
+      variable.key = req.file.key;
+      variable.avatarUrl = req.file.location;
+
+      updateUser = await User.findByIdAndUpdate(req.id, variable, {
+        new: true,
+      });
+    }
+
+    res.status(200).json({ success: true, data: updateUser });
   } catch (error) {
     next(error);
   }

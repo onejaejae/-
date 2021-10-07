@@ -14,6 +14,7 @@ import {
   getActivityList,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
+import { upload } from "../middlewares/imageUpload";
 
 const userRouter = express.Router();
 
@@ -32,7 +33,12 @@ userRouter.get(`${userRoutes.activity}/list`, authJWT, getActivityList);
 
 userRouter.get(userRoutes.profile, authJWT, getProfile);
 
-userRouter.patch(userRoutes.profile, authJWT, patchProfile);
+userRouter.patch(
+  userRoutes.profile,
+  authJWT,
+  upload.single("image"),
+  patchProfile
+);
 
 userRouter.delete("/", authJWT, deleteUser);
 
