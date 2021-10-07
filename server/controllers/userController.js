@@ -276,8 +276,6 @@ export const getActivity = async (req, res, next) => {
         return next(throwError(400, "quey의 key값이 올바르지 않습니다."));
     }
 
-    console.log(user);
-
     res.status(200).json({ success: true, data: user });
   } catch (error) {
     next(error);

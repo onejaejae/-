@@ -12,7 +12,7 @@ export const getReviewDetail = async (req, res, next) => {
       return next(throwError(400, "reviewId가 유효하지 않습니다."));
     }
 
-    const review = await Review.findById(reviewId);
+    const review = await Review.findById(reviewId, { likes: 0 });
     res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);

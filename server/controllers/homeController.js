@@ -177,7 +177,7 @@ export const getShow = async (req, res, next) => {
         break;
     }
 
-    const shows = await Show.find({ genrenm })
+    const shows = await Show.find({ genrenm }, { scraps: 0 })
       .sort(variable)
       .skip(page * 10)
       .limit(10);
@@ -191,7 +191,7 @@ export const getShow = async (req, res, next) => {
 export const getShowDetail = async (req, res, next) => {
   try {
     const { showId } = req.params;
-    const show = await Show.findById(showId);
+    const show = await Show.findById(showId, { scraps: 0 });
 
     res.status(200).json({ success: true, data: show });
   } catch (error) {
@@ -219,10 +219,13 @@ export const getSearchMusical = async (req, res, next) => {
         break;
     }
 
-    const musical = await Show.find({
-      genrenm: "뮤지컬",
-      prfnm: { $regex: term, $options: "i" },
-    })
+    const musical = await Show.find(
+      {
+        genrenm: "뮤지컬",
+        prfnm: { $regex: term, $options: "i" },
+      },
+      { scraps: 0 }
+    )
       .sort(variable)
       .skip(page * 10)
       .limit(10);
@@ -253,10 +256,13 @@ export const getSearchShow = async (req, res, next) => {
         break;
     }
 
-    const show = await Show.find({
-      genrenm: "연극",
-      prfnm: { $regex: term, $options: "i" },
-    })
+    const show = await Show.find(
+      {
+        genrenm: "연극",
+        prfnm: { $regex: term, $options: "i" },
+      },
+      { scraps: 0 }
+    )
       .sort(variable)
       .skip(page * 10)
       .limit(10);

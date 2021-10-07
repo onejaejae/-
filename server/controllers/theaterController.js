@@ -38,12 +38,12 @@ export const getReview = async (req, res, next) => {
   try {
     const { fcltynm, page = 0 } = req.query;
 
-    const review = await Review.find({ fcltynm })
+    const review = await Review.find({ fcltynm }, { likes: 0 })
       .sort({ _id: -1 })
       .skip(page * 10)
       .limit(10);
 
-    res.status(200).json({ success: true, data: review, size: review.length });
+    res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);
   }
