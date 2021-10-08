@@ -491,7 +491,7 @@ export const patchProfile = async (req, res, next) => {
       });
     } else {
       const variable = req.body;
-      variable.avatarUrl = `https://bogobogo.s3.ap-northeast-2.amazonaws.com/w140/${
+      variable.avatarUrl = `d1a63e1txx3v0t.cloudfront.net/w140/${
         key.split("/")[1]
       }`;
 
