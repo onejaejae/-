@@ -12,7 +12,9 @@ export const getReviewDetail = async (req, res, next) => {
       return next(throwError(400, "reviewId가 유효하지 않습니다."));
     }
 
-    const review = await Review.findById(reviewId, { likes: 0 });
+    const review = await Review.findById(reviewId, { likes: 0 }).populate(
+      "show"
+    );
     res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);
@@ -24,12 +26,13 @@ export const postReview = async (req, res, next) => {
     const { fcltynm, mt20id } = req.body;
 
     const user = await User.findById(req.id);
-    req.body.writer = user;
-    const newReview = new Review(req.body);
-
     const show = await Show.findOne({ mt20id });
     const result =
       (show.totalRating + req.body.rating) / (show.reviewNumber + 1);
+
+    req.body.writer = user;
+    req.body.show = show.id;
+    const newReview = new Review(req.body);
 
     const [review] = await Promise.all([
       newReview.save(),

@@ -39,6 +39,12 @@ export const reviewSchema = new mongoose.Schema(
       required: true,
     },
 
+    show: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Show",
+    },
+
     // 공연 리뷰
     showContent: {
       type: String,
