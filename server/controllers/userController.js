@@ -473,28 +473,39 @@ export const getSeat = async (req, res, next) => {
 
 export const patchProfile = async (req, res, next) => {
   try {
-    const {
-      file,
-      file: { key },
-    } = req;
+    const { file } = req;
     let updateUser;
 
     if (!file) {
       const user = await User.findById(req.id);
-      s3.deleteObject({ Bucket: "bogobogo", Key: user.key }, (error, data) => {
-        if (error) throw error;
-      });
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
+        (error, data) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
+        (error, data) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
+        (error, data) => {
+          if (error) throw error;
+        }
+      );
 
       const variable = req.body;
+      variable.avatarUrl = "";
       updateUser = await User.findByIdAndUpdate(req.id, variable, {
         new: true,
       });
     } else {
       const variable = req.body;
-      variable.avatarUrl = `d1a63e1txx3v0t.cloudfront.net/w140/${
-        key.split("/")[1]
-      }`;
-
+      // eslint-disable-next-line prefer-destructuring
+      variable.avatarUrl = file.key.split("/")[1];
       updateUser = await User.findByIdAndUpdate(req.id, variable, {
         new: true,
       });
@@ -508,7 +519,8 @@ export const patchProfile = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    await Promise.all([
+    const [user] = await Promise.all([
+      User.findById(req.id),
       User.findByIdAndDelete(req.id),
       Review.updateMany(
         { "writer._id": req.id },
@@ -519,8 +531,15 @@ export const deleteUser = async (req, res, next) => {
         { "review.$[element].writer.nickname": "탈퇴 회원" },
         { arrayFilters: [{ "element.writer._id": "615c80f9b0f04609d03d3b19" }] }
       ),
+      Show.updateMany({}, { $pull: { scraps: { userId: req.id } } }),
+      Review.updateMany(
+        {},
+        { $pull: { likes: { userId: req.id } }, $inc: { likeNumber: -1 } }
+      ),
     ]);
 
+    if (user.avatarUrl) {
+    }
     // await Theater.updateMany(
     //   {
     //     "review.writer": { _id: req.id },
@@ -531,7 +550,7 @@ export const deleteUser = async (req, res, next) => {
     // const theater = await Theater.findOne({ "review.writer._id": req.id });
     // console.log(theater);
 
-    redisClient.del(req.id);
+    // redisClient.del(req.id);
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);
