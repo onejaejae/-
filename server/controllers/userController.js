@@ -543,7 +543,7 @@ export const deleteUser = async (req, res, next) => {
       Theater.updateMany(
         {},
         { "review.$[element].writer.nickname": "탈퇴 회원" },
-        { arrayFilters: [{ "element.writer._id": "615c80f9b0f04609d03d3b19" }] }
+        { arrayFilters: [{ "element.writer._id": req.id }] }
       ),
       Show.updateMany({}, { $pull: { scraps: { userId: req.id } } }),
       Review.updateMany(
@@ -553,18 +553,27 @@ export const deleteUser = async (req, res, next) => {
     ]);
 
     if (user.avatarUrl) {
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
+        (error, data) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
+        (error, data) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
+        (error, data) => {
+          if (error) throw error;
+        }
+      );
     }
-    // await Theater.updateMany(
-    //   {
-    //     "review.writer": { _id: req.id },
-    //   },
-    //   { "review.$.writer": { nickname: "탈퇴 회원" } }
-    // );
 
-    // const theater = await Theater.findOne({ "review.writer._id": req.id });
-    // console.log(theater);
-
-    // redisClient.del(req.id);
+    redisClient.del(req.id);
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);
