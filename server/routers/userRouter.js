@@ -12,6 +12,7 @@ import {
   getProfile,
   patchProfile,
   getActivityList,
+  getSeatList,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 import { upload } from "../middlewares/imageUpload";
@@ -24,6 +25,7 @@ userRouter.get(userRoutes.jwt, getJwt);
 userRouter.get(userRoutes.refresh, getRefresh);
 
 userRouter.get(userRoutes.seat, getSeat);
+userRouter.get(`${userRoutes.seat}/list`, getSeatList);
 
 userRouter.get(userRoutes.logout, authJWT, getLogout);
 

@@ -471,6 +471,20 @@ export const getSeat = async (req, res, next) => {
   }
 };
 
+export const getSeatList = async (req, res, next) => {
+  try {
+    const { theaterName } = req.query;
+
+    const seat = await Seat.find({ theaterName }).sort({
+      createdAt: 1,
+    });
+
+    return res.status(200).json({ success: true, data: seat });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const patchProfile = async (req, res, next) => {
   try {
     const { file } = req;
