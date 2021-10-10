@@ -37,6 +37,9 @@ export const getTheaterDetail = async (req, res, next) => {
 export const getReview = async (req, res, next) => {
   try {
     const { fcltynm, page = 0 } = req.query;
+    if (!fcltynm) {
+      return next(throwError(400, "query에 fcltynm이 없습니다."));
+    }
 
     const review = await Review.find({ fcltynm }, { likes: 0 })
       .sort({ _id: -1 })

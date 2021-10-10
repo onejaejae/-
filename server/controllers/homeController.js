@@ -5,6 +5,7 @@ import Show from "../models/Show";
 import Theater from "../models/Theater";
 import User from "../models/User";
 import throwError from "../utils/throwError";
+import Review from "../models/Review";
 
 const RemoveJsonTextAttribute = (value, parentElement) => {
   try {
@@ -191,11 +192,18 @@ export const getShow = async (req, res, next) => {
 export const getShowDetail = async (req, res, next) => {
   try {
     const { showId } = req.params;
+    const { page = 0 } = req.query;
+
     if (!mongoose.isValidObjectId(showId))
       return next(throwError(400, "showId가 유효하지 않습니다."));
 
     const show = await Show.findById(showId, { scraps: 0 });
-    res.status(200).json({ success: true, data: show });
+    const review = await Review.find({ mt20id: show.mt20id })
+      .skip(page * 10)
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    res.status(200).json({ success: true, data: { show, review } });
   } catch (error) {
     next(error);
   }
