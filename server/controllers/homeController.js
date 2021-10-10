@@ -337,7 +337,7 @@ export const patchUnScrap = async (req, res, next) => {
       return next(throwError(400, "showId가 유효하지 않습니다."));
     }
 
-    await Promise.all([
+    const [user] = await Promise.all([
       User.findByIdAndUpdate(req.id, {
         $pull: { scrapShow: showId },
       }),
@@ -346,7 +346,7 @@ export const patchUnScrap = async (req, res, next) => {
       }),
     ]);
 
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true, data: user });
   } catch (error) {
     next(error);
   }
