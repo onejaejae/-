@@ -12,9 +12,12 @@ export const getReviewDetail = async (req, res, next) => {
       return next(throwError(400, "reviewId가 유효하지 않습니다."));
     }
 
-    const review = await Review.findById(reviewId, { likes: 0 }).populate(
-      "show"
-    );
+    const review = await Review.findById(reviewId, {
+      likes: 0,
+      fcltynm: 0,
+      mt20id: 0,
+      prfnm: 0,
+    }).populate("show");
     res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);
@@ -45,7 +48,14 @@ export const postReview = async (req, res, next) => {
       ),
       User.updateOne(
         { _id: req.id },
-        { $push: { postReview: { $each: [newReview.id], $slice: -10 } } }
+        {
+          $push: {
+            postReview: {
+              $each: [newReview.id],
+              $slice: -10,
+            },
+          },
+        }
       ),
       Show.updateOne(
         { mt20id },
@@ -95,7 +105,7 @@ export const deleteReview = async (req, res, next) => {
       Show.findOne({ mt20id }),
     ]);
 
-    const totalRating = show.totalRating - review.rating;
+    const totalRating = show.totalRating - review.reviewRating;
     const rating = totalRating / (show.reviewNumber - 1);
 
     await Promise.all([
@@ -135,7 +145,11 @@ export const patchLike = async (req, res, next) => {
         reviewId,
         {
           $inc: { likeNumber: 1 },
-          $push: { likes: { userId: req.id, createAt: Date.now() } },
+          $push: {
+            likes: {
+              $each: [{ userId: req.id, createAt: Date.now() }],
+            },
+          },
         },
         { new: true }
       ),

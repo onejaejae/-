@@ -306,7 +306,9 @@ export const patchScrap = async (req, res, next) => {
       Show.findByIdAndUpdate(
         showId,
         {
-          $push: { scraps: { userId: req.id, createAt: Date.now() } },
+          $push: {
+            scraps: { userId: req.id, createAt: Date.now() },
+          },
         },
         { new: true }
       ),

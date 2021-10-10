@@ -256,10 +256,13 @@ export const getActivity = async (req, res, next) => {
       case "write":
         data = await User.findById(req.id, {
           postReview: 1,
-        }).populate({
-          path: "postReview",
-          populate: { path: "show" },
-        });
+        })
+          .populate({
+            path: "postReview",
+            populate: { path: "show" },
+          })
+          .sort({ createAt: -1 });
+
         break;
       case "like":
         data = await User.findById(req.id, { likeReview: 1 }).populate({
@@ -316,7 +319,9 @@ export const getActivityList = async (req, res, next) => {
         break;
 
       default:
-        return next(throwError(400, "query의 key값이 올바르지 않습니다."));
+        return next(
+          throwError(400, "type key값의 value 값이 올바르지 않습니다.")
+        );
     }
 
     res.status(200).json({ success: true, data });
