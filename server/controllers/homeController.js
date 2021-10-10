@@ -170,7 +170,7 @@ export const getShow = async (req, res, next) => {
         variable = { prfpdfrom: -1 };
         break;
       case "rating":
-        variable = { rating: -1 };
+        variable = { rating: -1, prfnm: 1 };
         break;
 
       default:
@@ -191,8 +191,10 @@ export const getShow = async (req, res, next) => {
 export const getShowDetail = async (req, res, next) => {
   try {
     const { showId } = req.params;
-    const show = await Show.findById(showId, { scraps: 0 });
+    if (!mongoose.isValidObjectId(showId))
+      return next(throwError(400, "showId가 유효하지 않습니다."));
 
+    const show = await Show.findById(showId, { scraps: 0 });
     res.status(200).json({ success: true, data: show });
   } catch (error) {
     next(error);
@@ -204,19 +206,23 @@ export const getSearchMusical = async (req, res, next) => {
     const { term, page = 0, sort } = req.query;
 
     let variable = { prfnm: 1 };
-    switch (sort) {
-      case "name":
-        variable = { prfnm: 1 };
-        break;
-      case "latest":
-        variable = { prfpdfrom: -1 };
-        break;
-      case "rating":
-        variable = { rating: -1 };
-        break;
+    if (sort) {
+      switch (sort) {
+        case "name":
+          variable = { prfnm: 1 };
+          break;
+        case "latest":
+          variable = { prfpdfrom: -1 };
+          break;
+        case "rating":
+          variable = { rating: -1, prfpdfrom: -1 };
+          break;
 
-      default:
-        break;
+        default:
+          return next(
+            throwError(400, "sort key값의 value 값이 올바르지 않습니다.")
+          );
+      }
     }
 
     const musical = await Show.find(
@@ -241,19 +247,23 @@ export const getSearchShow = async (req, res, next) => {
     const { term, page = 0, sort } = req.query;
 
     let variable = { prfnm: 1 };
-    switch (sort) {
-      case "name":
-        variable = { prfnm: 1 };
-        break;
-      case "latest":
-        variable = { prfpdfrom: -1 };
-        break;
-      case "rating":
-        variable = { rating: -1 };
-        break;
+    if (sort) {
+      switch (sort) {
+        case "name":
+          variable = { prfnm: 1 };
+          break;
+        case "latest":
+          variable = { prfpdfrom: -1 };
+          break;
+        case "rating":
+          variable = { rating: -1 };
+          break;
 
-      default:
-        break;
+        default:
+          return next(
+            throwError(400, "sort key값의 value 값이 올바르지 않습니다.")
+          );
+      }
     }
 
     const show = await Show.find(
