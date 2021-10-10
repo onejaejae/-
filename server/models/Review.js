@@ -84,7 +84,7 @@ export const reviewSchema = new mongoose.Schema(
     },
 
     // 별점
-    rating: {
+    reviewRating: {
       type: Number,
       required: true,
     },

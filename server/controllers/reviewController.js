@@ -28,7 +28,7 @@ export const postReview = async (req, res, next) => {
     const user = await User.findById(req.id);
     const show = await Show.findOne({ mt20id });
     const result =
-      (show.totalRating + req.body.rating) / (show.reviewNumber + 1);
+      (show.totalRating + req.body.reviewRating) / (show.reviewNumber + 1);
 
     req.body.writer = user;
     req.body.show = show.id;
@@ -52,7 +52,7 @@ export const postReview = async (req, res, next) => {
         {
           $inc: { reviewNumber: 1 },
           rating: result.toFixed(1),
-          totalRating: show.totalRating + req.body.rating,
+          totalRating: show.totalRating + req.body.reviewRating,
         }
       ),
     ]);

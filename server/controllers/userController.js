@@ -246,38 +246,41 @@ export const getLogout = async (req, res, next) => {
 
 export const getActivity = async (req, res, next) => {
   try {
-    // todo
-    // 각 필드마다 slice 적용
-
     const { type } = req.query;
     if (!type) {
-      return next(throwError(400, "quey에 type이 없습니다."));
+      return next(throwError(400, "query type이 없습니다."));
     }
 
-    let user;
+    let data;
     switch (type) {
       case "write":
-        user = await User.findById(req.id, { postReview: 1 }).populate(
-          "postReview"
-        );
+        data = await User.findById(req.id, {
+          postReview: 1,
+        }).populate({
+          path: "postReview",
+          populate: { path: "show" },
+        });
         break;
       case "like":
-        user = await User.findById(req.id, { likeReview: 1 }).populate(
-          "likeReview"
-        );
+        data = await User.findById(req.id, { likeReview: 1 }).populate({
+          path: "likeReview",
+          populate: { path: "show" },
+        });
         break;
 
       case "scrap":
-        user = await User.findById(req.id, { scrapShow: 1 }).populate(
+        data = await User.findById(req.id, { scrapShow: 1 }).populate(
           "scrapShow"
         );
         break;
 
       default:
-        return next(throwError(400, "quey의 key값이 올바르지 않습니다."));
+        return next(
+          throwError(400, "type key값의 value 값이 올바르지 않습니다.")
+        );
     }
 
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
   }
@@ -489,35 +492,36 @@ export const patchProfile = async (req, res, next) => {
   try {
     const { file } = req;
     let updateUser;
+    const variable = req.body;
 
     if (!file) {
       const user = await User.findById(req.id);
-      s3.deleteObject(
-        { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
-        (error, data) => {
-          if (error) throw error;
-        }
-      );
-      s3.deleteObject(
-        { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
-        (error, data) => {
-          if (error) throw error;
-        }
-      );
-      s3.deleteObject(
-        { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
-        (error, data) => {
-          if (error) throw error;
-        }
-      );
+      if (user.avatarUrl) {
+        s3.deleteObject(
+          { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
+          (error, data) => {
+            if (error) throw error;
+          }
+        );
+        s3.deleteObject(
+          { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
+          (error, data) => {
+            if (error) throw error;
+          }
+        );
+        s3.deleteObject(
+          { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
+          (error, data) => {
+            if (error) throw error;
+          }
+        );
+        variable.avatarUrl = "";
+      }
 
-      const variable = req.body;
-      variable.avatarUrl = "";
       updateUser = await User.findByIdAndUpdate(req.id, variable, {
         new: true,
       });
     } else {
-      const variable = req.body;
       // eslint-disable-next-line prefer-destructuring
       variable.avatarUrl = file.key.split("/")[1];
       updateUser = await User.findByIdAndUpdate(req.id, variable, {
