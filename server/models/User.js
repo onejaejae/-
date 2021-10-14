@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
       {
         type: mongoose.SchemaTypes.ObjectId,
         ref: "Review",
+        default: [],
       },
     ],
 
@@ -21,6 +22,7 @@ const userSchema = new mongoose.Schema(
       {
         type: mongoose.SchemaTypes.ObjectId,
         ref: "Review",
+        default: [],
       },
     ],
 
@@ -29,6 +31,7 @@ const userSchema = new mongoose.Schema(
       {
         type: mongoose.SchemaTypes.ObjectId,
         ref: "Show",
+        default: [],
       },
     ],
 

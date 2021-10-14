@@ -346,7 +346,13 @@ export const getActivityList = async (req, res, next) => {
 
 export const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.id, { nickname: 1, avatarUrl: 1 });
+    const user = await User.findById(req.id, {
+      nickname: 1,
+      avatarUrl: 1,
+      likeReview: 1,
+      postReview: 1,
+      scrapShow: 1,
+    });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
     next(error);
