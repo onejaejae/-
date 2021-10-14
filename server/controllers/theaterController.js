@@ -27,6 +27,9 @@ export const getTheaterDetail = async (req, res, next) => {
     }
 
     const theater = await Theater.findById(theaterId);
+    theater.review = theater.review.sort((a, b) => {
+      return b.createdAt - a.createdAt;
+    });
 
     res.status(200).json({ success: true, data: theater });
   } catch (error) {
