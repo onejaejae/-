@@ -109,8 +109,8 @@ export const deleteReview = async (req, res, next) => {
     const rating = totalRating / (show.reviewNumber - 1);
 
     await Promise.all([
-      Review.findByIdAndDelete(reviewId),
       User.updateOne({ _id: req.id }, { $pull: { postReview: reviewId } }),
+      Review.findByIdAndDelete(reviewId),
       Theater.updateOne(
         { name: review.fcltynm },
         { $inc: { reviewCount: -1 }, $pull: { review: { _id: reviewId } } }
