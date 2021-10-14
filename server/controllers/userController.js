@@ -256,18 +256,24 @@ export const getActivity = async (req, res, next) => {
       case "write":
         data = await User.findById(req.id, {
           postReview: 1,
-        })
-          .populate({
-            path: "postReview",
-            populate: { path: "show" },
-          })
-          .sort({ createdAt: -1 });
-
+        }).populate({
+          path: "postReview",
+          populate: { path: "show" },
+        });
+        data = data.postReview.sort((a, b) => {
+          return b.createdAt - a.createdAt;
+        });
         break;
       case "like":
         data = await User.findById(req.id, { likeReview: 1 }).populate({
           path: "likeReview",
           populate: { path: "show" },
+        });
+        data = data.likeReview.sort((a, b) => {
+          return (
+            b.likes[b.likes.length - 1].createAt -
+            a.likes[a.likes.length - 1].createAt
+          );
         });
         break;
 
@@ -275,6 +281,14 @@ export const getActivity = async (req, res, next) => {
         data = await User.findById(req.id, { scrapShow: 1 }).populate(
           "scrapShow"
         );
+        console.log(data);
+        data = data.scrapShow.sort((a, b) => {
+          return (
+            b.scraps[b.scraps.length - 1].createAt -
+            a.scraps[a.scraps.length - 1].createAt
+          );
+        });
+        console.log(data);
         break;
 
       default:
@@ -344,27 +358,31 @@ export const postSeat = async (req, res, next) => {
   try {
     const { name, location, floor } = req.body;
 
-    await Theater.create({
-      name,
-      location,
-    });
+    // await Theater.create({
+    //   name,
+    //   location,
+    // });
 
     const result = [];
 
-    // req.body.data.forEach((data) => {
-    //   data.forEach(async (data2) => {
-    //     delete data2.color;
-    //     data2.theaterName = name;
-    //     data2.version = 1.0;
-    //     data2.floor = floor;
+    req.body.data.forEach((data) => {
+      data.forEach(async (data2) => {
+        delete data2.color;
+        data2.theaterName = name;
+        data2.version = 1.0;
+        data2.floor = floor;
 
-    //     const seat = new Seat(data2);
-    //     result.push(seat);
-    //   });
-    // });
+        if (!data2.index) {
+          const seat = new Seat(data2);
+          result.push(seat);
+        }
+      });
+    });
 
     // await Seat.insertMany(result);
     console.log("finished!!");
+    console.log(result);
+    console.log(result.length);
 
     res.status(200).json({ success: true });
   } catch (error) {
@@ -504,19 +522,19 @@ export const patchProfile = async (req, res, next) => {
       if (user.avatarUrl) {
         s3.deleteObject(
           { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
-          (error, data) => {
+          (error) => {
             if (error) throw error;
           }
         );
         s3.deleteObject(
           { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
-          (error, data) => {
+          (error) => {
             if (error) throw error;
           }
         );
         s3.deleteObject(
           { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
-          (error, data) => {
+          (error) => {
             if (error) throw error;
           }
         );
@@ -564,19 +582,19 @@ export const deleteUser = async (req, res, next) => {
     if (user.avatarUrl) {
       s3.deleteObject(
         { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
-        (error, data) => {
+        (error) => {
           if (error) throw error;
         }
       );
       s3.deleteObject(
         { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
-        (error, data) => {
+        (error) => {
           if (error) throw error;
         }
       );
       s3.deleteObject(
         { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
-        (error, data) => {
+        (error) => {
           if (error) throw error;
         }
       );
