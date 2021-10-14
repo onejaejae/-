@@ -445,16 +445,16 @@ export const getSeat = async (req, res, next) => {
     const obj = {};
 
     seat.forEach((data) => {
-      obj[`${data.floor}`] = {};
+      obj[`${data.floor}층`] = {};
     });
 
     seat.forEach((data) => {
-      const x = obj[`${data.floor}`];
+      const x = obj[`${data.floor}층`];
       x[`${data.section ? data.section : data.column}`] = {};
     });
 
     seat.forEach((data) => {
-      const x = obj[`${data.floor}`];
+      const x = obj[`${data.floor}층`];
       const y = x[`${data.section ? data.section : data.column}`];
 
       if (
@@ -472,7 +472,7 @@ export const getSeat = async (req, res, next) => {
     });
 
     seat.forEach((data) => {
-      const x = obj[`${data.floor}`];
+      const x = obj[`${data.floor}층`];
       const y = x[`${data.section ? data.section : data.column}`];
 
       if (
