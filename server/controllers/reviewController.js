@@ -43,7 +43,7 @@ export const postReview = async (req, res, next) => {
         { name: fcltynm },
         {
           $inc: { reviewCount: 1 },
-          $push: { review: { $each: [newReview], $slice: -10 } },
+          $push: { review: { $each: [newReview], $position: 0 } },
         }
       ),
       User.updateOne(
@@ -52,7 +52,7 @@ export const postReview = async (req, res, next) => {
           $push: {
             postReview: {
               $each: [newReview.id],
-              $slice: -10,
+              $position: 0,
             },
           },
         }
@@ -113,7 +113,13 @@ export const deleteReview = async (req, res, next) => {
       Review.findByIdAndDelete(reviewId),
       Theater.updateOne(
         { name: review.fcltynm },
-        { $inc: { reviewCount: -1 }, $pull: { review: { _id: reviewId } } }
+        {
+          $inc: { reviewCount: -1 },
+          $pull: {
+            review: { _id: reviewId },
+          },
+          $push: { postReview: { $each: [], position: 0 } },
+        }
       ),
       Show.updateOne(
         { mt20id: review.mt20id },
@@ -127,13 +133,17 @@ export const deleteReview = async (req, res, next) => {
       ),
     ]);
 
-    const user = await User.findById(req.id);
-    const userReview = await Review.findOne({
-      "writer._id": req.id,
-      _id: { $lt: user.postReview[0] },
-    });
-    console.log(user);
-    console.log(userReview);
+    // const user = await User.findById(req.id);
+    // const userReview = await Review.findOne({
+    //   "writer._id": req.id,
+    //   _id: { $lt: user.postReview[0] },
+    // }).sort({ _id: -1 });
+
+    // if (userReview) {
+    //   await User.findByIdAndUpdate(req.id, {
+    //     $push: { postReview: { $each: [userReview], $position: 0 } },
+    //   });
+    // }
 
     res.status(200).json({ success: true });
   } catch (error) {
