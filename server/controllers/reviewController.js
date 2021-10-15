@@ -109,10 +109,7 @@ export const deleteReview = async (req, res, next) => {
     const rating = totalRating / (show.reviewNumber - 1);
 
     await Promise.all([
-      User.updateOne(
-        { _id: req.id },
-        { $pull: { postReview: reviewId }, $slice: {} }
-      ),
+      User.updateOne({ _id: req.id }, { $pull: { postReview: reviewId } }),
       Review.findByIdAndDelete(reviewId),
       Theater.updateOne(
         { name: review.fcltynm },
@@ -129,6 +126,14 @@ export const deleteReview = async (req, res, next) => {
         }
       ),
     ]);
+
+    const user = await User.findById(req.id);
+    const userReview = await Review.findOne({
+      "writer._id": req.id,
+      _id: { $lt: user.postReview[0] },
+    });
+    console.log(user);
+    console.log(userReview);
 
     res.status(200).json({ success: true });
   } catch (error) {
