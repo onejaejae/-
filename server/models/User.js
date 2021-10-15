@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
 
     avatarUrl: {
       type: String,
-      default: "",
+      default: "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg",
     },
 
     kakaoId: Number,

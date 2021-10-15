@@ -518,12 +518,12 @@ export const getSeatList = async (req, res, next) => {
 export const patchProfile = async (req, res, next) => {
   try {
     const { file } = req;
-    let updateUser;
     const variable = req.body;
+    console.log(file);
 
+    const user = await User.findById(req.id);
     if (!file) {
-      const user = await User.findById(req.id);
-      if (user.avatarUrl) {
+      if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
         s3.deleteObject(
           { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
           (error) => {
@@ -542,21 +542,48 @@ export const patchProfile = async (req, res, next) => {
             if (error) throw error;
           }
         );
-        variable.avatarUrl = "";
+        variable.avatarUrl = "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg";
       }
-
-      updateUser = await User.findByIdAndUpdate(req.id, variable, {
-        new: true,
-      });
+    } else if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
+        (error) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
+        (error) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
+        (error) => {
+          if (error) throw error;
+        }
+      );
+      // eslint-disable-next-line prefer-destructuring
+      variable.avatarUrl = file.key.split("/")[1];
     } else {
       // eslint-disable-next-line prefer-destructuring
       variable.avatarUrl = file.key.split("/")[1];
-      updateUser = await User.findByIdAndUpdate(req.id, variable, {
-        new: true,
-      });
     }
 
-    res.status(200).json({ success: true, data: updateUser });
+    console.log(variable.avatarUrl);
+    await User.findByIdAndUpdate(req.id, variable, {
+      new: true,
+    });
+
+    const newUser = await User.findById(req.id, {
+      nickname: 1,
+      avatarUrl: 1,
+      likeReview: 1,
+      postReview: 1,
+      scrapShow: 1,
+    });
+
+    res.status(200).json({ success: true, data: newUser });
   } catch (error) {
     next(error);
   }
@@ -583,7 +610,7 @@ export const deleteUser = async (req, res, next) => {
       ),
     ]);
 
-    if (user.avatarUrl) {
+    if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
       s3.deleteObject(
         { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
         (error) => {
