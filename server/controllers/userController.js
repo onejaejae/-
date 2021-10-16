@@ -250,7 +250,6 @@ export const getActivity = async (req, res, next) => {
     if (!type) {
       return next(throwError(400, "query type이 없습니다."));
     }
-
     let data;
     switch (type) {
       case "write":
@@ -263,6 +262,7 @@ export const getActivity = async (req, res, next) => {
         data = data.postReview.sort((a, b) => {
           return b.createdAt - a.createdAt;
         });
+
         break;
       case "like":
         data = await User.findById(req.id, { likeReview: 1 }).populate({
@@ -276,7 +276,6 @@ export const getActivity = async (req, res, next) => {
           );
         });
         break;
-
       case "scrap":
         data = await User.findById(req.id, { scrapShow: 1 }).populate(
           "scrapShow"
@@ -290,13 +289,11 @@ export const getActivity = async (req, res, next) => {
         });
         console.log(data);
         break;
-
       default:
         return next(
           throwError(400, "type key값의 value 값이 올바르지 않습니다.")
         );
     }
-
     res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);

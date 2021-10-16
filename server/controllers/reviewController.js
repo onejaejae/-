@@ -100,24 +100,46 @@ export const deleteReview = async (req, res, next) => {
     if (!mt20id) {
       return next(throwError(400, "query에 mt20id이 없습니다."));
     }
-    const [review, show] = await Promise.all([
+
+    const [review, show, user] = await Promise.all([
       Review.findById(reviewId),
       Show.findOne({ mt20id }),
+      User.findById(req.id),
     ]);
+
+    const theater = await Theater.findOne({ name: review.fcltynm });
 
     const totalRating = show.totalRating - review.reviewRating;
     const rating = totalRating / (show.reviewNumber - 1);
 
+    if (user.postReview.find((r) => r.toString() === reviewId)) {
+      user.postReview = user.postReview.filter(
+        (r) => r.toString() !== reviewId
+      );
+      if (user.postReview.length > 0) {
+        const newReview = await Review.findOne({
+          "writer._id": req.id,
+          _id: { $lt: user.postReview[0] },
+        }).sort({ _id: -1 });
+        if (newReview) user.postReview.unshift(newReview.id);
+      }
+    }
+
+    if (theater.review.find((r) => r.id === reviewId)) {
+      theater.review = theater.review.filter((r) => r.id !== reviewId);
+      if (theater.review.length > 0) {
+        const newReview = await Review.findOne({
+          fcltynm: theater.name,
+          _id: { $lt: theater.review[0].id },
+        }).sort({ _id: -1 });
+        if (newReview) theater.review.unshift(newReview);
+      }
+    }
+
     await Promise.all([
-      User.updateOne(
-        { _id: req.id },
-        { $pull: { postReview: reviewId }, $slice: {} }
-      ),
+      user.save(),
+      theater.save(),
       Review.findByIdAndDelete(reviewId),
-      Theater.updateOne(
-        { name: review.fcltynm },
-        { $inc: { reviewCount: -1 }, $pull: { review: { _id: reviewId } } }
-      ),
       Show.updateOne(
         { mt20id: review.mt20id },
         {
