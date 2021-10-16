@@ -8,7 +8,10 @@ export const getTheater = async (req, res, next) => {
     const { sort, page = 0 } = req.query;
 
     const variable = sort === "review" ? { reviewCount: -1 } : { name: 1 };
-    const theater = await Theater.find({})
+    const theater = await Theater.find(
+      {},
+      { review: 0, createdAt: 0, updatedAt: 0, __v: 0 }
+    )
       .sort(variable)
       .skip(page * 10)
       .limit(10);
@@ -26,10 +29,13 @@ export const getTheaterDetail = async (req, res, next) => {
       return next(throwError(400, "theaterId가 유효하지 않습니다."));
     }
 
-    const theater = await Theater.findById(theaterId);
-    theater.review = theater.review.sort((a, b) => {
-      return b.createdAt - a.createdAt;
-    });
+    const theater = await Theater.findById(theaterId, {
+      review: 0,
+      createdAt: 0,
+      updatedAt: 0,
+      __v: 0,
+      review: { $slice: [0, 10] },
+    }).populate("review");
 
     res.status(200).json({ success: true, data: theater });
   } catch (error) {

@@ -254,7 +254,7 @@ export const getActivity = async (req, res, next) => {
     switch (type) {
       case "write":
         data = await User.findById(req.id, {
-          postReview: 1,
+          postReview: { $slice: [0, 10] },
         }).populate({
           path: "postReview",
           populate: { path: "show" },
