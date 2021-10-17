@@ -14,6 +14,7 @@ const REFRESH = "/refresh";
 const SEAT = "/seat";
 
 const ACTIVITY = "/activity";
+const ACTIVITY_REVIEW = "/activity/review";
 
 const PROFILE = "/profile";
 
@@ -24,6 +25,7 @@ const userRoutes = {
   jwt: JWT,
   seat: SEAT,
   activity: ACTIVITY,
+  activityReview: ACTIVITY_REVIEW,
   profile: PROFILE,
 };
 

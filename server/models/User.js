@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { reviewSchema } from "./Review";
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,32 +9,8 @@ const userSchema = new mongoose.Schema(
       unique: 1,
     },
 
-    // 좋아요 한 리뷰들
-    likeReview: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Review",
-        default: [],
-      },
-    ],
-
     // 작성 한 리뷰들
-    postReview: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Review",
-        default: [],
-      },
-    ],
-
-    // 눈 여겨본 공연들
-    scrapShow: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Show",
-        default: [],
-      },
-    ],
+    postReview: [reviewSchema],
 
     avatarUrl: {
       type: String,

@@ -3,6 +3,7 @@ import Review from "../models/Review";
 import Theater from "../models/Theater";
 import User from "../models/User";
 import Show from "../models/Show";
+import Like from "../models/Like";
 import throwError from "../utils/throwError";
 
 export const getReviewDetail = async (req, res, next) => {
@@ -43,7 +44,7 @@ export const postReview = async (req, res, next) => {
         { name: fcltynm },
         {
           $inc: { reviewCount: 1 },
-          $push: { review: { $each: [newReview], $position: 0 } },
+          $push: { review: { $each: [newReview], $slice: -10 } },
         }
       ),
       User.updateOne(
@@ -51,8 +52,8 @@ export const postReview = async (req, res, next) => {
         {
           $push: {
             postReview: {
-              $each: [newReview.id],
-              $position: 0,
+              $each: [newReview],
+              $slice: -10,
             },
           },
         }
@@ -112,16 +113,14 @@ export const deleteReview = async (req, res, next) => {
     const totalRating = show.totalRating - review.reviewRating;
     const rating = totalRating / (show.reviewNumber - 1);
 
-    if (user.postReview.find((r) => r.toString() === reviewId)) {
-      user.postReview = user.postReview.filter(
-        (r) => r.toString() !== reviewId
-      );
+    if (user.postReview.find((r) => r.id === reviewId)) {
+      user.postReview = user.postReview.filter((r) => r.id !== reviewId);
       if (user.postReview.length > 0) {
         const newReview = await Review.findOne({
           "writer._id": req.id,
-          _id: { $lt: user.postReview[0] },
+          _id: { $lt: user.postReview[0].id },
         }).sort({ _id: -1 });
-        if (newReview) user.postReview.unshift(newReview.id);
+        if (newReview) user.postReview.unshift(newReview);
       }
     }
 
@@ -152,18 +151,6 @@ export const deleteReview = async (req, res, next) => {
       ),
     ]);
 
-    // const user = await User.findById(req.id);
-    // const userReview = await Review.findOne({
-    //   "writer._id": req.id,
-    //   _id: { $lt: user.postReview[0] },
-    // }).sort({ _id: -1 });
-
-    // if (userReview) {
-    //   await User.findByIdAndUpdate(req.id, {
-    //     $push: { postReview: { $each: [userReview], $position: 0 } },
-    //   });
-    // }
-
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);
@@ -177,25 +164,24 @@ export const patchLike = async (req, res, next) => {
       return next(throwError(400, "reviewId가 유효하지 않습니다."));
     }
 
-    const [updateReview] = await Promise.all([
+    const like = new Like({ userId: req.id, reviewId });
+    const review = await Review.findById(reviewId);
+
+    await Promise.all([
+      like.save(),
       Review.findByIdAndUpdate(
         reviewId,
         {
           $inc: { likeNumber: 1 },
-          $push: {
-            likes: {
-              $each: [{ userId: req.id, createAt: Date.now() }],
-            },
-          },
         },
         { new: true }
       ),
       User.findByIdAndUpdate(req.id, {
-        $push: { likeReview: { $each: [reviewId], slice: -10 } },
+        $push: { likeReview: { $each: [review], $slice: -10 } },
       }),
     ]);
 
-    res.status(200).json({ success: true, data: updateReview });
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }
@@ -208,19 +194,39 @@ export const patchUnlike = async (req, res, next) => {
       return next(throwError(400, "reviewId가 유효하지 않습니다."));
     }
 
-    const [updateReview] = await Promise.all([
-      Review.findByIdAndUpdate(
-        reviewId,
-        {
-          $inc: { likeNumber: -1 },
-          $pull: { likes: { userId: req.id } },
-        },
-        { new: true }
-      ),
-      User.findByIdAndUpdate(req.id, { $pull: { likeReview: reviewId } }),
+    const [user, like] = await Promise.all([
+      User.findById(req.id),
+      Like.findOne({ reviewId }),
     ]);
 
-    res.status(200).json({ success: true, data: updateReview });
+    if (user.likeReview.find((r) => r.id === reviewId)) {
+      console.log("heeloio");
+      user.likeReview = user.likeReview.filter((r) => r.id !== reviewId);
+      if (user.likeReview.length > 0) {
+        const newReview = await Like.findOne({
+          userId: req.id,
+          _id: { $lt: user.likeReview[0].id },
+        })
+          .sort({ _id: -1 })
+          .populate("reviewId");
+        console.log(newReview);
+        // if (newReview) user.postReview.unshift(newLike);
+      }
+    }
+
+    //  await Promise.all([
+    //       Like.findByIdAndDelete(likeId),
+    //       Review.findByIdAndUpdate(
+    //         like.reviewId,
+    //         {
+    //           $inc: { likeNumber: -1 },
+    //         },
+    //         { new: true }
+    //       ),
+    //       User.findByIdAndUpdate(req.id, { $pull: { likeReview: likeId } }),
+    //     ]);
+
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }

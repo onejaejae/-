@@ -22,5 +22,6 @@ module.exports = {
     "import/prefer-default-export": "off",
     "no-dupe-keys": "off",
     "no-nested-ternary": "off",
+    "no-plusplus": "off",
   },
 };

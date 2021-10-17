@@ -6,6 +6,7 @@ import Theater from "../models/Theater";
 import User from "../models/User";
 import throwError from "../utils/throwError";
 import Review from "../models/Review";
+import Scrap from "../models/Scrap";
 
 const RemoveJsonTextAttribute = (value, parentElement) => {
   try {
@@ -344,26 +345,8 @@ export const patchScrap = async (req, res, next) => {
       return next(throwError(400, "showId가 유효하지 않습니다."));
     }
 
-    const [user] = await Promise.all([
-      User.findByIdAndUpdate(
-        req.id,
-        {
-          $push: { scrapShow: { $each: [showId], $slice: -10 } },
-        },
-        { new: true }
-      ),
-      Show.findByIdAndUpdate(
-        showId,
-        {
-          $push: {
-            scraps: { userId: req.id, createAt: Date.now() },
-          },
-        },
-        { new: true }
-      ),
-    ]);
-
-    res.status(200).json({ success: true, data: user });
+    await Scrap.create({ userId: req.id, showId });
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }
@@ -376,14 +359,7 @@ export const patchUnScrap = async (req, res, next) => {
       return next(throwError(400, "showId가 유효하지 않습니다."));
     }
 
-    const [user] = await Promise.all([
-      User.findByIdAndUpdate(req.id, {
-        $pull: { scrapShow: showId },
-      }),
-      Show.findByIdAndUpdate(showId, {
-        $pull: { scraps: { userId: req.id } },
-      }),
-    ]);
+    await Scrap.findOneAndDelete({ showId });
 
     res.status(200).json({ success: true, data: user });
   } catch (error) {

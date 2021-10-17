@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { reviewSchema } from "./Review";
 
 const theaterSchema = new mongoose.Schema(
   {
@@ -10,13 +11,7 @@ const theaterSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    review: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Review",
-        default: [],
-      },
-    ],
+    review: [reviewSchema],
 
     reviewCount: {
       type: Number,

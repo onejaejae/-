@@ -35,7 +35,11 @@ export const getTheaterDetail = async (req, res, next) => {
       updatedAt: 0,
       __v: 0,
       review: { $slice: [0, 10] },
-    }).populate("review");
+    });
+
+    theater.review = theater.review.sort((a, b) => {
+      return b.createdAt - a.createdAt;
+    });
 
     res.status(200).json({ success: true, data: theater });
   } catch (error) {

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const showSchema = new mongoose.Schema(
+export const showSchema = new mongoose.Schema(
   {
     // 공연ID
     mt20id: {
@@ -123,10 +123,6 @@ const showSchema = new mongoose.Schema(
       default: 0,
       required: true,
     },
-
-    scraps: [
-      { userId: { type: mongoose.Types.ObjectId }, createAt: { type: Date } },
-    ],
   },
 
   { timestamps: true }

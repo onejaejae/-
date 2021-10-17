@@ -5,6 +5,7 @@ import throwError from "../utils/throwError";
 import tokenApi from "../utils/tokenApi";
 import User from "../models/User";
 import Seat from "../models/Seat";
+import Like from "../models/Like";
 import Theater from "../models/Theater";
 import userExist from "../utils/userExist";
 import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
@@ -12,6 +13,7 @@ import logger from "../config/logger";
 import Review from "../models/Review";
 import Show from "../models/Show";
 import { s3 } from "../aws";
+import Scrap from "../models/Scrap";
 
 const { FACEBOOK_ID } = process.env;
 
@@ -244,63 +246,23 @@ export const getLogout = async (req, res, next) => {
   }
 };
 
-export const getActivity = async (req, res, next) => {
+export const getPostReview = async (req, res, next) => {
   try {
-    const { type } = req.query;
-    if (!type) {
-      return next(throwError(400, "query type이 없습니다."));
-    }
-    let data;
-    switch (type) {
-      case "write":
-        data = await User.findById(req.id, {
-          postReview: { $slice: [0, 10] },
-        }).populate({
-          path: "postReview",
-          populate: { path: "show" },
-        });
-        data = data.postReview.sort((a, b) => {
-          return b.createdAt - a.createdAt;
-        });
+    const data = await User.findById(req.id, {
+      postReview: 1,
+    });
 
-        break;
-      case "like":
-        data = await User.findById(req.id, { likeReview: 1 }).populate({
-          path: "likeReview",
-          populate: { path: "show" },
-        });
-        data = data.likeReview.sort((a, b) => {
-          return (
-            b.likes[b.likes.length - 1].createAt -
-            a.likes[a.likes.length - 1].createAt
-          );
-        });
-        break;
-      case "scrap":
-        data = await User.findById(req.id, { scrapShow: 1 }).populate(
-          "scrapShow"
-        );
-        console.log(data);
-        data = data.scrapShow.sort((a, b) => {
-          return (
-            b.scraps[b.scraps.length - 1].createAt -
-            a.scraps[a.scraps.length - 1].createAt
-          );
-        });
-        console.log(data);
-        break;
-      default:
-        return next(
-          throwError(400, "type key값의 value 값이 올바르지 않습니다.")
-        );
-    }
+    data.postReview = data.postReview.sort((a, b) => {
+      return b.createdAt - a.createdAt;
+    });
+
     res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
   }
 };
 
-export const getActivityList = async (req, res, next) => {
+export const getActivity = async (req, res, next) => {
   try {
     const { page = 0, type } = req.query;
     if (!type) {
@@ -312,19 +274,28 @@ export const getActivityList = async (req, res, next) => {
       case "write":
         data = await Review.find({ "writer._id": req.id }, { likes: 0 })
           .sort({ createdAt: -1 })
+          .populate("show")
           .skip(page * 10)
           .limit(10);
         break;
       case "like":
-        data = await Review.find({ "likes.userId": req.id }, { likes: 0 })
-          .sort({ "scraps.createdAt": -1 })
+        data = await Like.find({ userId: req.id }, { reviewId: 1 })
+          .sort({ _id: -1 })
+          .populate("reviewId")
+          .populate({
+            path: "reviewId",
+            populate: {
+              path: "show",
+            },
+          })
           .skip(page * 10)
           .limit(10);
         break;
 
       case "scrap":
-        data = await Show.find({ "scraps.userId": req.id }, { scraps: 0 })
-          .sort({ "scraps.createdAt": -1 })
+        data = await Scrap.find({ userId: req.id }, { showId: 1 })
+          .sort({ _id: -1 })
+          .populate("showId")
           .skip(page * 10)
           .limit(10);
         break;
@@ -588,8 +559,17 @@ export const patchProfile = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    const [user] = await Promise.all([
+    const [user, like] = await Promise.all([
       User.findById(req.id),
+      Like.find({ userId: req.id }),
+    ]);
+
+    const likeReview = [];
+    for (let i = 0, max = like.length; i < max; i++) {
+      likeReview.push(like.reviewId);
+    }
+
+    await Promise.all([
       User.findByIdAndDelete(req.id),
       Review.updateMany(
         { "writer._id": req.id },
@@ -600,11 +580,12 @@ export const deleteUser = async (req, res, next) => {
         { "review.$[element].writer.nickname": "탈퇴 회원" },
         { arrayFilters: [{ "element.writer._id": req.id }] }
       ),
-      Show.updateMany({}, { $pull: { scraps: { userId: req.id } } }),
       Review.updateMany(
-        {},
-        { $pull: { likes: { userId: req.id } }, $inc: { likeNumber: -1 } }
+        { _id: { $in: likeReview } },
+        { $inc: { likeNumber: -1 } }
       ),
+      Like.deleteMany({ userId: req.id }),
+      Scrap.deleteMany({ userId: req.id }),
     ]);
 
     if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {

@@ -95,11 +95,6 @@ export const reviewSchema = new mongoose.Schema(
       default: false,
     },
 
-    // 리뷰 좋아요
-    likes: [
-      { userId: { type: mongoose.Types.ObjectId }, createAt: { type: Date } },
-    ],
-
     // 재방문여부
     isRevist: {
       type: Boolean,
