@@ -361,7 +361,7 @@ export const patchUnScrap = async (req, res, next) => {
 
     await Scrap.findOneAndDelete({ showId });
 
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }

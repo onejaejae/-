@@ -69,9 +69,19 @@ export const patchReview = async (req, res, next) => {
       return next(throwError(400, "reviewId가 유효하지 않습니다."));
     }
 
-    const updateReview = await Review.findByIdAndUpdate(reviewId, req.body, {
-      new: true,
-    });
+    const [updateReview, theater] = await Promise.all([
+      Review.findByIdAndUpdate(reviewId, req.body, {
+        new: true,
+      }),
+      Theater.findOne({ "review._id": reviewId }),
+    ]);
+
+    if (theater) {
+      theater.review = theater.review.filter((r) => r.id !== reviewId);
+      theater.review.unshift(updateReview);
+      await theater.save();
+    }
+
     res.status(200).json({ success: true, data: updateReview });
   } catch (error) {
     next(error);
@@ -98,7 +108,6 @@ export const deleteReview = async (req, res, next) => {
 
     if (theater.review.find((r) => r.id === reviewId)) {
       theater.review = theater.review.filter((r) => r.id !== reviewId);
-      console.log("hello");
       if (theater.review.length > 0) {
         const newReview = await Review.findOne({
           fcltynm: theater.name,
