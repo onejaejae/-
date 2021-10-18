@@ -550,7 +550,7 @@ export const deleteUser = async (req, res, next) => {
 
     const likeReview = [];
     for (let i = 0, max = like.length; i < max; i++) {
-      likeReview.push(like.reviewId);
+      likeReview.push(like[i].reviewId);
     }
 
     await Promise.all([
