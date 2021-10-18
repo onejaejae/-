@@ -163,58 +163,45 @@ export const getShow = async (req, res, next) => {
       return next(throwError(400, "query에 genrenm이 없습니다."));
     }
     let shows;
+    let sortVariable = { prfnm: 1 };
+
+    switch (sort) {
+      case "name":
+        sortVariable = { prfnm: 1 };
+        break;
+      case "latest":
+        sortVariable = { prfpdfrom: -1 };
+        break;
+      case "rating":
+        sortVariable = { rating: -1, prfnm: 1 };
+        break;
+
+      default:
+        break;
+    }
 
     if (genrenm === "연극" && type) {
       const findVariable =
         type === "open" ? { genrenm, openrun: "Y" } : { genrenm, openrun: "N" };
-      let sortVariable = { prfnm: 1 };
-
-      switch (sort) {
-        case "name":
-          sortVariable = { prfnm: 1 };
-          break;
-        case "latest":
-          sortVariable = { prfpdfrom: -1 };
-          break;
-        case "rating":
-          sortVariable = { rating: -1, prfnm: 1 };
-          break;
-
-        default:
-          break;
-      }
 
       shows = await Show.find(findVariable, {
         scraps: 0,
         __v: 0,
         updatedAt: 0,
         createdAt: 0,
+        totalRating: 0,
       })
         .sort(sortVariable)
         .skip(page * 10)
         .limit(10);
+
+      return res.status(200).json({ success: true, data: shows });
     } else {
-      let variable = { prfnm: 1 };
-      switch (sort) {
-        case "name":
-          variable = { prfnm: 1 };
-          break;
-        case "latest":
-          variable = { prfpdfrom: -1 };
-          break;
-        case "rating":
-          variable = { rating: -1, prfnm: 1 };
-          break;
-
-        default:
-          break;
-      }
-
       shows = await Show.find(
         { genrenm },
-        { scraps: 0, __v: 0, updatedAt: 0, createdAt: 0 }
+        { __v: 0, updatedAt: 0, createdAt: 0, totalRating: 0 }
       )
-        .sort(variable)
+        .sort(sortVariable)
         .skip(page * 10)
         .limit(10);
     }
@@ -233,8 +220,17 @@ export const getShowDetail = async (req, res, next) => {
     if (!mongoose.isValidObjectId(showId))
       return next(throwError(400, "showId가 유효하지 않습니다."));
 
-    const show = await Show.findById(showId, { scraps: 0 });
-    const review = await Review.find({ mt20id: show.mt20id })
+    const show = await Show.findById(showId, {
+      scraps: 0,
+      totalRating: 0,
+      createdAt: 0,
+      updatedAt: 0,
+      __v: 0,
+    });
+    const review = await Review.find(
+      { showId },
+      { createAt: 0, __v: 0, updatedAt: 0, createdAt: 0 }
+    )
       .skip(page * 10)
       .sort({ createdAt: -1 })
       .limit(10);
@@ -271,7 +267,7 @@ export const getSearchShow = async (req, res, next) => {
         genrenm: "연극",
         prfnm: { $regex: term, $options: "i" },
       },
-      { scraps: 0 }
+      { __v: 0, updatedAt: 0, createdAt: 0, totalRating: 0 }
     )
       .sort(variable)
       .skip(page * 10)
@@ -311,7 +307,7 @@ export const getSearchMusical = async (req, res, next) => {
         genrenm: "뮤지컬",
         prfnm: { $regex: term, $options: "i" },
       },
-      { scraps: 0 }
+      { __v: 0, updatedAt: 0, createdAt: 0, totalRating: 0 }
     )
       .sort(variable)
       .skip(page * 10)
@@ -326,9 +322,17 @@ export const getSearchMusical = async (req, res, next) => {
 export const getSearchTheater = async (req, res, next) => {
   try {
     const { term, page = 0 } = req.query;
-    const theater = await Theater.find({
-      name: { $regex: term, $options: "i" },
-    })
+    const theater = await Theater.find(
+      {
+        name: { $regex: term, $options: "i" },
+      },
+      {
+        "review.__v": 0,
+        "review.createdAt": 0,
+        "review.createAt": 0,
+        "review.updatedAt": 0,
+      }
+    )
       .skip(page * 10)
       .limit(10);
 

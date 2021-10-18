@@ -16,9 +16,16 @@ export const getReviewDetail = async (req, res, next) => {
     const review = await Review.findById(reviewId, {
       likes: 0,
       fcltynm: 0,
-      mt20id: 0,
       prfnm: 0,
-    }).populate("show");
+      casting: 0,
+      createAt: 0,
+      createdAt: 0,
+      updatedAt: 0,
+      __v: 0,
+    }).populate(
+      "showId",
+      "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
+    );
     res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);
@@ -56,7 +63,7 @@ export const postReview = async (req, res, next) => {
       }),
     ]);
 
-    res.status(200).json({ success: true, review });
+    res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);
   }
@@ -71,7 +78,8 @@ export const patchReview = async (req, res, next) => {
 
     const [updateReview, theater] = await Promise.all([
       Review.findByIdAndUpdate(reviewId, req.body, {
-        new: true,
+        returnNewDocument: true,
+        projection: { createAt: 0, createdAt: 0, updatedAt: 0, __v: 0 },
       }),
       Theater.findOne({ "review._id": reviewId }),
     ]);

@@ -7,7 +7,8 @@ export const getTheater = async (req, res, next) => {
   try {
     const { sort, page = 0 } = req.query;
 
-    const variable = sort === "review" ? { reviewCount: -1 } : { name: 1 };
+    const variable =
+      sort === "review" ? { reviewCount: -1, name: 1 } : { name: 1 };
     const theater = await Theater.find(
       {},
       { review: 0, createdAt: 0, updatedAt: 0, __v: 0 }
@@ -30,11 +31,12 @@ export const getTheaterDetail = async (req, res, next) => {
     }
 
     const theater = await Theater.findById(theaterId, {
-      review: 0,
       createdAt: 0,
       updatedAt: 0,
       __v: 0,
-      review: { $slice: [0, 10] },
+      "review.__v": 0,
+      "review.createAt": 0,
+      "review.updatedAt": 0,
     });
 
     theater.review = theater.review.sort((a, b) => {
@@ -54,7 +56,23 @@ export const getReview = async (req, res, next) => {
       return next(throwError(400, "query에 fcltynm이 없습니다."));
     }
 
-    const review = await Review.find({ fcltynm }, { likes: 0 })
+    const review = await Review.find(
+      { fcltynm },
+      {
+        likes: 0,
+        fcltynm: 0,
+        prfnm: 0,
+        createAt: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0,
+        casting: 0,
+      }
+    )
+      .populate(
+        "showId",
+        "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
+      )
       .sort({ _id: -1 })
       .skip(page * 10)
       .limit(10);

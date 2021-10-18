@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import faker from "faker";
 import redisClient from "../utils/redis";
 import throwError from "../utils/throwError";
 import tokenApi from "../utils/tokenApi";
@@ -146,8 +145,7 @@ export const getJwt = async (req, res, next) => {
 
         if (!user) {
           user = await User.create({
-            nickname:
-              faker.internet.userName() + parseInt(Math.random() * 100000),
+            nickname: `포도알${parseInt(Math.random() * 100000)}`,
             kakaoId: userData.id,
           });
         }
@@ -163,8 +161,7 @@ export const getJwt = async (req, res, next) => {
 
         if (!user) {
           user = await User.create({
-            nickname:
-              faker.internet.userName() + parseInt(Math.random() * 100000),
+            nickname: `포도알${parseInt(Math.random() * 100000)}`,
             naverId: userData.response.id,
           });
         }
@@ -184,8 +181,7 @@ export const getJwt = async (req, res, next) => {
 
           if (!user) {
             user = await User.create({
-              nickname:
-                faker.internet.userName() + parseInt(Math.random() * 100000),
+              nickname: `포도알${parseInt(Math.random() * 100000)}`,
               googleId: userData.id,
             });
           }
@@ -207,8 +203,7 @@ export const getJwt = async (req, res, next) => {
 
           if (!user) {
             user = await User.create({
-              nickname:
-                faker.internet.userName() + parseInt(Math.random() * 100000),
+              nickname: `포도알${parseInt(Math.random() * 100000)}`,
               facebookId: userData.id,
             });
           }
@@ -256,9 +251,24 @@ export const getActivity = async (req, res, next) => {
     let data;
     switch (type) {
       case "write":
-        data = await Review.find({ "writer._id": req.id }, { likes: 0 })
+        data = await Review.find(
+          { "writer._id": req.id },
+          {
+            likes: 0,
+            fcltynm: 0,
+            prfnm: 0,
+            createAt: 0,
+            createdAt: 0,
+            updatedAt: 0,
+            __v: 0,
+            casting: 0,
+          }
+        )
           .sort({ createdAt: -1 })
-          .populate("showId")
+          .populate(
+            "showId",
+            "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
+          )
           .skip(page * 10)
           .limit(10);
         break;
@@ -270,6 +280,8 @@ export const getActivity = async (req, res, next) => {
             path: "reviewId",
             populate: {
               path: "showId",
+              select:
+                "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty",
             },
           })
           .skip(page * 10)
@@ -279,7 +291,10 @@ export const getActivity = async (req, res, next) => {
       case "scrap":
         data = await Scrap.find({ userId: req.id }, { showId: 1 })
           .sort({ _id: -1 })
-          .populate("showId")
+          .populate(
+            "showId",
+            "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
+          )
           .skip(page * 10)
           .limit(10);
         break;
@@ -301,9 +316,6 @@ export const getProfile = async (req, res, next) => {
     const user = await User.findById(req.id, {
       nickname: 1,
       avatarUrl: 1,
-      likeReview: 1,
-      postReview: 1,
-      scrapShow: 1,
     });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -471,9 +483,9 @@ export const patchProfile = async (req, res, next) => {
   try {
     const { file } = req;
     const variable = req.body;
-    console.log(file);
 
     const user = await User.findById(req.id);
+
     if (!file) {
       if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
         s3.deleteObject(
@@ -522,17 +534,14 @@ export const patchProfile = async (req, res, next) => {
       variable.avatarUrl = file.key.split("/")[1];
     }
 
-    console.log(variable.avatarUrl);
     await User.findByIdAndUpdate(req.id, variable, {
-      new: true,
+      returnNewDocument: true,
+      projection: { avatarUrl: 1, _id: 1, nickname: 1 },
     });
 
     const newUser = await User.findById(req.id, {
       nickname: 1,
       avatarUrl: 1,
-      likeReview: 1,
-      postReview: 1,
-      scrapShow: 1,
     });
 
     res.status(200).json({ success: true, data: newUser });
