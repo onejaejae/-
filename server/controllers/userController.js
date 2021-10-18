@@ -246,22 +246,6 @@ export const getLogout = async (req, res, next) => {
   }
 };
 
-export const getPostReview = async (req, res, next) => {
-  try {
-    const data = await User.findById(req.id, {
-      postReview: 1,
-    });
-
-    data.postReview = data.postReview.sort((a, b) => {
-      return b.createdAt - a.createdAt;
-    });
-
-    res.status(200).json({ success: true, data });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getActivity = async (req, res, next) => {
   try {
     const { page = 0, type } = req.query;
@@ -274,7 +258,7 @@ export const getActivity = async (req, res, next) => {
       case "write":
         data = await Review.find({ "writer._id": req.id }, { likes: 0 })
           .sort({ createdAt: -1 })
-          .populate("show")
+          .populate("showId")
           .skip(page * 10)
           .limit(10);
         break;
@@ -285,7 +269,7 @@ export const getActivity = async (req, res, next) => {
           .populate({
             path: "reviewId",
             populate: {
-              path: "show",
+              path: "showId",
             },
           })
           .skip(page * 10)

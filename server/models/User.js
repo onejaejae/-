@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { reviewSchema } from "./Review";
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,9 +7,6 @@ const userSchema = new mongoose.Schema(
       required: false,
       unique: 1,
     },
-
-    // 작성 한 리뷰들
-    postReview: [reviewSchema],
 
     avatarUrl: {
       type: String,

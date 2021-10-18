@@ -11,7 +11,6 @@ import {
   getActivity,
   getProfile,
   patchProfile,
-  getPostReview,
   getSeatList,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
@@ -28,8 +27,6 @@ userRouter.get(userRoutes.seat, getSeat);
 userRouter.get(`${userRoutes.seat}/list`, getSeatList);
 
 userRouter.get(userRoutes.logout, authJWT, getLogout);
-
-userRouter.get(userRoutes.activityReview, authJWT, getPostReview);
 
 userRouter.get(userRoutes.activity, authJWT, getActivity);
 

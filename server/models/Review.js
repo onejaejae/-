@@ -21,12 +21,6 @@ export const reviewSchema = new mongoose.Schema(
       required: true,
     },
 
-    // 공연 id
-    mt20id: {
-      type: String,
-      required: true,
-    },
-
     // 뮤지컬 or 연극 제목
     prfnm: {
       type: String,
@@ -39,7 +33,7 @@ export const reviewSchema = new mongoose.Schema(
       required: true,
     },
 
-    show: {
+    showId: {
       type: mongoose.Types.ObjectId,
       required: true,
       ref: "Show",
