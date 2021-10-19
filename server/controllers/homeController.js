@@ -333,6 +333,7 @@ export const getSearchTheater = async (req, res, next) => {
         "review.updatedAt": 0,
       }
     )
+      .sort({ name: 1 })
       .skip(page * 10)
       .limit(10);
 
