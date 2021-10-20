@@ -343,7 +343,7 @@ export const getSearchTheater = async (req, res, next) => {
   }
 };
 
-export const patchScrap = async (req, res, next) => {
+export const postScrap = async (req, res, next) => {
   try {
     const { showId } = req.params;
     if (!mongoose.isValidObjectId(showId)) {
@@ -357,7 +357,7 @@ export const patchScrap = async (req, res, next) => {
   }
 };
 
-export const patchUnScrap = async (req, res, next) => {
+export const deleteUnScrap = async (req, res, next) => {
   try {
     const { showId } = req.params;
     if (!mongoose.isValidObjectId(showId)) {
