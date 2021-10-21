@@ -12,6 +12,9 @@ export const reviewSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      avatarUrl: {
+        type: String,
+      },
     },
 
     // 극장 이름
