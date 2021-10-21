@@ -4,3 +4,4 @@ bogobogo.pem
 logs
 *.log
 data
+dist

@@ -17,9 +17,11 @@ dotenv.config();
 
 const app = express();
 
-const { PORT } = process.env;
+const { PORT, NODE_ENV } = process.env;
 app.use(responseTime());
 app.use(morgan("dev"));
+
+let isDisableKeepAlive = false;
 
 // request entity too large 해결 위해
 app.use(
@@ -51,5 +53,17 @@ app.use((req, res) => {
 if (!PORT) console.error("PORT is required");
 
 app.listen(PORT, () => {
+  if (NODE_ENV === "production") process.send("ready");
+
   console.log(`Server listening on ${PORT}`);
 });
+
+if (NODE_ENV === "production") {
+  process.on("SIGINT", () => {
+    isDisableKeepAlive = true;
+    app.close(() => {
+      console.log("server closed");
+      process.exit(0);
+    });
+  });
+}
