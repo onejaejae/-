@@ -19,6 +19,7 @@
     "express": "^4.17.1",
     "faker": "^5.5.3",
     "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^2.0.5",
     "mime-types": "^2.1.33",
     "mongoose": "^5.13.7",
     "morgan": "^1.10.0",

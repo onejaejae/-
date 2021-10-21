@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import jwksClient from "jwks-rsa";
 import redisClient from "../utils/redis";
 import throwError from "../utils/throwError";
 import tokenApi from "../utils/tokenApi";
@@ -15,6 +16,24 @@ import { s3 } from "../aws";
 import Scrap from "../models/Scrap";
 
 const { FACEBOOK_ID } = process.env;
+
+const client = jwksClient({
+  jwksUri: "https://sandrino.auth0.com/.well-known/jwks.json",
+});
+
+const getAppleSigningKey = (kid) => {
+  return new Promise((resolve) => {
+    client.getSigningKey(kid, (err, key) => {
+      if (err) {
+        console.error(err);
+        resolve(null);
+        return;
+      }
+      const signingKey = key.getPublicKey();
+      resolve(signingKey);
+    });
+  });
+};
 
 // refresh
 export const getRefresh = async (req, res, next) => {
@@ -79,11 +98,14 @@ export const getJwt = async (req, res, next) => {
   try {
     const { provider } = req.query;
 
-    if (!req.headers.authorization) {
+    if (provider !== "apple" && !req.headers.authorization) {
       return next(throwError(400, "header에 accessToken이 없습니다."));
     }
 
-    const AccessToken = req.headers.authorization.split("Bearer ")[1];
+    let AccessToken;
+    if (provider !== "apple") {
+      AccessToken = req.headers.authorization.split("Bearer ")[1];
+    }
     const userObj = {};
     let Tokendata;
     let userData;
@@ -126,10 +148,49 @@ export const getJwt = async (req, res, next) => {
         }
         break;
 
+      case "apple":
+        try {
+          const { idToken } = req.query;
+          console.log(idToken);
+
+          const json = jwt.decode(idToken, { complete: true });
+          const { kid } = json.header;
+
+          const appleKeys = await getAppleSigningKey(kid);
+          if (!appleKeys) {
+            console.error("something went wrong");
+            return;
+          }
+
+          userObj.appleId = idToken;
+          user = await userExist(userObj);
+
+          if (!user) {
+            user = await User.create({
+              nickname: `포도알${parseInt(Math.random() * 100000)}`,
+              appleId: idToken,
+            });
+          }
+
+          // jwt 발급
+          const accessToken = sign(user);
+          const refreshToken = refresh();
+
+          redisClient.set(user.id, refreshToken);
+
+          logger.info(`GET /jwt 200 Response: "success: true"`);
+
+          return res
+            .status(200)
+            .json({ success: true, data: { accessToken, refreshToken } });
+        } catch (error) {
+          next(error);
+        }
+        break;
+
       default:
         return next(throwError(400, "잘못된 provider입니다."));
     }
-
     if (Tokendata.status !== 200) {
       return next(throwError(400, "토큰이 유효하지 않습니다."));
     }

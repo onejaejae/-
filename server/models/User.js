@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
       default: "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg",
     },
 
+    appleId: String,
     kakaoId: Number,
     facebookId: Number,
     googleId: Number,
