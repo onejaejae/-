@@ -177,7 +177,6 @@ export const getJwt = async (req, res, next) => {
           const refreshToken = refresh();
 
           redisClient.set(user.id, refreshToken);
-
           logger.info(`GET /jwt 200 Response: "success: true"`);
 
           return res
