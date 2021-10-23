@@ -28,4 +28,4 @@ services:
     volumes:
       - ../server:/usr/share/nginx/html
       - ../certbot-etc:/etc/letsencrypt
-    command: certonly --dry-run --webroot --webroot-path=/usr/share/nginx/html --email yoteamo7@naver.com --agree-tos --no-eff-email --keep-until-expiring -d bogobogo.shop -d www.bogobogo.shop
+    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email yoteamo7@naver.com --agree-tos --no-eff-email --keep-until-expiring -d bogobogo.shop -d www.bogobogo.shop
