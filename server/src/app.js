@@ -1,6 +1,8 @@
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import helmet from "helmet";
+import hpp from "hpp";
 import "./db";
 import responseTime from "response-time";
 import userRoutes from "./routes/users.routes";
@@ -18,8 +20,15 @@ dotenv.config();
 const app = express();
 
 const { PORT, NODE_ENV } = process.env;
+
+if (NODE_ENV === "production") {
+  app.use(morgan("combined"));
+  app.use(hpp());
+  app.use(helmet());
+} else {
+  app.use(morgan("dev"));
+}
 app.use(responseTime());
-app.use(morgan("dev"));
 
 let isDisableKeepAlive = false;
 

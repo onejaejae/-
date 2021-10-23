@@ -20,6 +20,8 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "faker": "^5.5.3",
+    "helmet": "^4.6.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.5",
     "mime-types": "^2.1.33",
