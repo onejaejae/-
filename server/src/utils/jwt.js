@@ -53,6 +53,7 @@ export const refreshVerify = async (token, userId) => {
 
   try {
     const data = await getAsync(userId); // refresh token 가져오기
+    console.log("data", data);
     if (token === data) {
       try {
         jwt.verify(token, JWT_SECRET);

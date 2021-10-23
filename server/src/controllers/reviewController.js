@@ -78,7 +78,7 @@ export const patchReview = async (req, res, next) => {
 
     const [updateReview, theater] = await Promise.all([
       Review.findByIdAndUpdate(reviewId, req.body, {
-        returnNewDocument: true,
+        new: true,
         projection: { createAt: 0, createdAt: 0, updatedAt: 0, __v: 0 },
       }),
       Theater.findOne({ "review._id": reviewId }),
