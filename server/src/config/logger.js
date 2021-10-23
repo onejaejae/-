@@ -1,18 +1,20 @@
 import winston from "winston";
+import moment from "moment";
+import "moment-timezone";
 
 const { createLogger, transports, format } = winston;
-const { combine, timestamp, printf, label, colorize, simple } = format;
+const { combine, printf, label, colorize, simple } = format;
+
+moment.tz.setDefault("Asia/Seoul");
+const timeStamp = () => moment().format("YYYY-MM-DD HH:mm:ss");
 
 const printLogFormat = {
   file: combine(
     label({
       label: "보고보고",
     }),
-    timestamp({
-      format: "YYYY-MM-DD HH:mm:dd",
-    }),
-    printf(({ timestamp, label, level, message }) => {
-      return `${timestamp} ${label} ${level}: ${message}`;
+    printf(({ label, level, message }) => {
+      return `${timeStamp()} ${label} ${level}: ${message}`;
     })
   ),
   console: combine(colorize(), simple()),
