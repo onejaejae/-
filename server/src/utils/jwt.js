@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import logger from "../config/logger";
 import redisClient from "./redis";
 
 dotenv.config();
@@ -53,6 +54,8 @@ export const refreshVerify = async (token, userId) => {
 
   try {
     const data = await getAsync(userId); // refresh token 가져오기
+    logger.info(`userId ${userId}`);
+    logger.info(`refresh data ${data}`);
     if (token === data) {
       try {
         jwt.verify(token, JWT_SECRET);

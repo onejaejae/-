@@ -47,9 +47,15 @@ app.use(theaterRoutes.theater, theaterRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
+  let status;
   console.error(err.message);
+  if (err.status) {
+    status = err.status;
+  } else {
+    status = 500;
+  }
   logger.error(
-    `${res.req.method} ${res.req.url} ${err.status} Response: "success: false, msg: ${err.message}"`
+    `${res.req.method} ${res.req.url} ${status} Response: "success: false, msg: ${err.message}"`
   );
   res.status(err.status || 500);
   res.json({ success: false, message: err.message });
