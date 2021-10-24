@@ -281,11 +281,6 @@ export const getJwt = async (req, res, next) => {
     const refreshToken = refresh();
 
     redisClient.set(user.id, refreshToken);
-    const { promisify } = require("util");
-    const getAsync = promisify(redisClient.get).bind(redisClient);
-    const data = await getAsync(user.id);
-    console.log("data", data);
-
     logger.info(`GET /jwt 200 Response: "success: true"`);
 
     res

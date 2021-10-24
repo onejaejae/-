@@ -31,6 +31,7 @@ export const verify = (token) => {
       id: decoded.id,
     };
   } catch (err) {
+    logger.error(`verify error ${err}`);
     return {
       success: false,
       message: err.message,
@@ -56,17 +57,20 @@ export const refreshVerify = async (token, userId) => {
     const data = await getAsync(userId); // refresh token 가져오기
     logger.info(`userId ${userId}`);
     logger.info(`refresh data ${data}`);
+
     if (token === data) {
       try {
         jwt.verify(token, JWT_SECRET);
         return true;
       } catch (err) {
+        logger.error(`token error ${err}`);
         return false;
       }
     } else {
       return false;
     }
   } catch (err) {
+    logger.error(`catch error ${err}`);
     return false;
   }
 };
