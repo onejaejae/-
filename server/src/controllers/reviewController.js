@@ -116,13 +116,12 @@ export const deleteReview = async (req, res, next) => {
 
     if (theater.review.find((r) => r.id === reviewId)) {
       theater.review = theater.review.filter((r) => r.id !== reviewId);
-      console.log("asd");
       if (theater.review.length > 0) {
         const newReview = await Review.findOne({
           fcltynm: theater.name,
           _id: { $lt: theater.review[0].id },
         }).sort({ _id: -1 });
-        console.log("newReview", newReview);
+
         if (newReview) theater.review.unshift(newReview);
       }
     }

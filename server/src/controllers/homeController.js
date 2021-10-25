@@ -350,7 +350,13 @@ export const postScrap = async (req, res, next) => {
       return next(throwError(400, "showId가 유효하지 않습니다."));
     }
 
-    await Scrap.create({ userId: req.id, showId });
+    await Promise.all([
+      Scrap.create({ userId: req.id, showId }),
+      User.findByIdAndUpdate(req.id, {
+        $addToSet: { scrapShows: showId },
+      }),
+    ]);
+
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);
@@ -364,7 +370,12 @@ export const deleteUnScrap = async (req, res, next) => {
       return next(throwError(400, "showId가 유효하지 않습니다."));
     }
 
-    await Scrap.findOneAndDelete({ showId });
+    await Promise.all([
+      Scrap.findOneAndDelete({ showId }),
+      User.findByIdAndUpdate(req.id, {
+        $pull: { scrapShows: showId },
+      }),
+    ]);
 
     res.status(200).json({ success: true });
   } catch (error) {

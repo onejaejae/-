@@ -371,6 +371,8 @@ export const getProfile = async (req, res, next) => {
     const user = await User.findById(req.id, {
       nickname: 1,
       avatarUrl: 1,
+      likeReviews: 1,
+      scrapShows: 1,
     });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
