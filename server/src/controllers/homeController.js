@@ -177,7 +177,7 @@ export const getShow = async (req, res, next) => {
         break;
 
       default:
-        break;
+        return next(throwError(400, "sort가 잘못되었습니다."));
     }
 
     if (genrenm === "연극" && type) {
@@ -338,6 +338,24 @@ export const getSearchTheater = async (req, res, next) => {
       .limit(10);
 
     res.status(200).json({ success: true, data: theater });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getReviewList = async (req, res, next) => {
+  try {
+    const { sort } = req.query;
+    console.log(sort);
+    if (sort !== "latest" && sort !== "like") {
+      return next(throwError(400, "sort가 잘못되었습니다."));
+    }
+
+    const sortVariable =
+      sort === "latest" ? { _id: -1 } : { likeNumber: -1, _id: -1 };
+
+    const review = await Review.find({}).sort(sortVariable).limit(5);
+    res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);
   }

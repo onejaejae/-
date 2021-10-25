@@ -8,6 +8,7 @@ import {
   getSearchTheater,
   postScrap,
   deleteUnScrap,
+  getReviewList,
 } from "../controllers/homeController";
 import authJWT from "../middlewares/authJWT";
 import homeRoutes from "../routes/home.routes";
@@ -22,6 +23,8 @@ homeRouter.get(homeRoutes.musicalSearch, authJWT, getSearchMusical);
 homeRouter.get(homeRoutes.showSearch, authJWT, getSearchShow);
 // 극장 검색
 homeRouter.get(homeRoutes.theaterSearch, authJWT, getSearchTheater);
+// 최신 or 좋아요순 리뷰 5개
+homeRouter.get(homeRoutes.review, authJWT, getReviewList);
 // 공연 상세 페이지
 homeRouter.get("/:showId", authJWT, getShowDetail);
 
