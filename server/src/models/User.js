@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
 
     likeReviews: [{ type: mongoose.Types.ObjectId }],
     scrapShows: [{ type: mongoose.Types.ObjectId }],
+    writeReviews: [{ type: mongoose.Types.ObjectId }],
 
     appleId: String,
     kakaoId: Number,

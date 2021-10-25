@@ -346,10 +346,6 @@ export const getActivity = async (req, res, next) => {
       case "scrap":
         data = await Scrap.find({ userId: req.id }, { showId: 1 })
           .sort({ _id: -1 })
-          .populate(
-            "showId",
-            "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
-          )
           .skip(page * 10)
           .limit(10);
         break;

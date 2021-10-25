@@ -59,7 +59,7 @@ export const postReview = async (req, res, next) => {
         totalRating: show.totalRating + req.body.reviewRating,
       }),
       User.findByIdAndUpdate(req.id, {
-        $addToSet: { likeReviews: newReview.id },
+        $addToSet: { writeReviews: newReview.id },
       }),
     ]);
 
@@ -112,7 +112,12 @@ export const deleteReview = async (req, res, next) => {
     ]);
 
     const totalRating = show.totalRating - review.reviewRating;
-    const rating = totalRating / (show.reviewNumber - 1);
+    let rating;
+    if (show.reviewNumber - 1 === 0) {
+      rating = 0;
+    } else {
+      rating = totalRating / (show.reviewNumber - 1);
+    }
 
     if (theater.review.find((r) => r.id === reviewId)) {
       theater.review = theater.review.filter((r) => r.id !== reviewId);
@@ -121,8 +126,9 @@ export const deleteReview = async (req, res, next) => {
           fcltynm: theater.name,
           _id: { $lt: theater.review[0].id },
         }).sort({ _id: -1 });
-
-        if (newReview) theater.review.unshift(newReview);
+        console.log(newReview);
+        if (newReview && newReview.id !== reviewId)
+          theater.review.unshift(newReview);
       }
     }
     theater.reviewCount -= 1;
@@ -137,7 +143,7 @@ export const deleteReview = async (req, res, next) => {
         },
       }),
       User.findByIdAndUpdate(req.id, {
-        $pull: { likeReviews: reviewId },
+        $pull: { writeReviews: reviewId },
       }),
     ]);
 
@@ -165,6 +171,9 @@ export const patchLike = async (req, res, next) => {
         },
         { new: true }
       ),
+      User.findByIdAndUpdate(req.id, {
+        $addToSet: { likeReviews: reviewId },
+      }),
     ]);
 
     res.status(200).json({ success: true });
@@ -189,6 +198,9 @@ export const patchUnlike = async (req, res, next) => {
         },
         { new: true }
       ),
+      User.findByIdAndUpdate(req.id, {
+        $pull: { likeReviews: reviewId },
+      }),
     ]);
 
     res.status(200).json({ success: true });
