@@ -22,10 +22,7 @@ export const getReviewDetail = async (req, res, next) => {
       createdAt: 0,
       updatedAt: 0,
       __v: 0,
-    }).populate(
-      "showId",
-      "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
-    );
+    });
     res.status(200).json({ success: true, data: review });
   } catch (error) {
     next(error);

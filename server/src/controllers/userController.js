@@ -329,25 +329,16 @@ export const getActivity = async (req, res, next) => {
           }
         )
           .sort({ createdAt: -1 })
-          .populate(
-            "showId",
-            "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
-          )
           .skip(page * 10)
           .limit(10);
         break;
       case "like":
         data = await Like.find({ userId: req.id }, { reviewId: 1 })
           .sort({ _id: -1 })
-          .populate("reviewId")
-          .populate({
-            path: "reviewId",
-            populate: {
-              path: "showId",
-              select:
-                "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty",
-            },
-          })
+          .populate(
+            "reviewId",
+            "writer seat casting likeNumber isSpoiler isRevist _id fcltynm prfnm showId sightContent showContent date reviewRating"
+          )
           .skip(page * 10)
           .limit(10);
         break;

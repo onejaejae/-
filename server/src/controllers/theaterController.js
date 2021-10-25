@@ -69,10 +69,6 @@ export const getReview = async (req, res, next) => {
         casting: 0,
       }
     )
-      .populate(
-        "showId",
-        "prfcast prfcrew pcseguidance dtguidance styurls rating reviewNumber _id mt20id  prfnm prfpdfrom prfpdto fcltynm poster genrenm prfstate openrun prfage prfruntime entrpsnm sty"
-      )
       .sort({ _id: -1 })
       .skip(page * 10)
       .limit(10);
