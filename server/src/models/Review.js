@@ -93,7 +93,7 @@ export const reviewSchema = new mongoose.Schema(
     },
 
     // 재방문여부
-    isRevist: {
+    isRevisit: {
       type: Boolean,
       default: true,
     },
