@@ -281,13 +281,6 @@ export const getJwt = async (req, res, next) => {
     const refreshToken = refresh();
 
     redisClient.set(user.id, refreshToken);
-
-    const { promisify } = require("util");
-    const getAsync = promisify(redisClient.get).bind(redisClient);
-    const data = await getAsync(user.id);
-    logger.info(`/jwt refreshTokne: ${data}`);
-    logger.info(`GET /jwt 200 Response: "success: true"`);
-
     res
       .status(200)
       .json({ success: true, data: { accessToken, refreshToken } });
@@ -335,10 +328,6 @@ export const getActivity = async (req, res, next) => {
       case "like":
         data = await Like.find({ userId: req.id }, { reviewId: 1 })
           .sort({ _id: -1 })
-          .populate(
-            "reviewId",
-            "writer seat casting likeNumber isSpoiler isRevist _id fcltynm prfnm showId sightContent showContent date reviewRating"
-          )
           .skip(page * 10)
           .limit(10);
         break;

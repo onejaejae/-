@@ -55,8 +55,6 @@ export const refreshVerify = async (token, userId) => {
 
   try {
     const data = await getAsync(userId); // refresh token 가져오기
-    logger.info(`userId ${userId}`);
-    logger.info(`refresh data ${data}`);
 
     if (token === data) {
       try {
