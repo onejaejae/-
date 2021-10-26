@@ -145,6 +145,8 @@ export const deleteReview = async (req, res, next) => {
       User.findByIdAndUpdate(req.id, {
         $pull: { writeReviews: reviewId },
       }),
+      User.updateMany({}, { $pull: { likeReviews: reviewId } }),
+      Like.deleteMany({ reviewId }),
     ]);
 
     res.status(200).json({ success: true });
