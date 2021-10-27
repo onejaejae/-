@@ -630,7 +630,11 @@ export const deleteUser = async (req, res, next) => {
       ),
       Theater.updateMany(
         {},
-        { "review.$[element].writer.nickname": "탈퇴 회원" },
+        {
+          "review.$[element].writer.nickname": "탈퇴 회원",
+          "review.$[element].writer.avatarUrl":
+            "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg",
+        },
         { arrayFilters: [{ "element.writer._id": req.id }] }
       ),
       Review.updateMany(
