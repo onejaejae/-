@@ -25,13 +25,14 @@ homeRouter.get(homeRoutes.showSearch, authJWT, getSearchShow);
 homeRouter.get(homeRoutes.theaterSearch, authJWT, getSearchTheater);
 // 최신 or 좋아요순 리뷰 5개
 homeRouter.get(homeRoutes.review, authJWT, getReviewList);
+
+// db 저장용
+homeRouter.get("/post", postShow);
+
 // 공연 상세 페이지
 homeRouter.get("/:showId", authJWT, getShowDetail);
 
 homeRouter.post(`/:showId${homeRoutes.scrap}`, authJWT, postScrap);
 homeRouter.delete(`/:showId${homeRoutes.unScrap}`, authJWT, deleteUnScrap);
-
-// db 저장용
-homeRouter.get("/post", postShow);
 
 export default homeRouter;

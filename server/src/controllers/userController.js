@@ -370,10 +370,10 @@ export const postSeat = async (req, res, next) => {
   try {
     const { name, location, floor } = req.body;
 
-    // await Theater.create({
-    //   name,
-    //   location,
-    // });
+    await Theater.create({
+      name,
+      location,
+    });
 
     const result = [];
 
@@ -384,16 +384,13 @@ export const postSeat = async (req, res, next) => {
         data2.version = 1.0;
         data2.floor = floor;
 
-        if (!data2.index) {
-          const seat = new Seat(data2);
-          result.push(seat);
-        }
+        const seat = new Seat(data2);
+        result.push(seat);
       });
     });
 
-    // await Seat.insertMany(result);
+    await Seat.insertMany(result);
     console.log("finished!!");
-    console.log(result);
     console.log(result.length);
 
     res.status(200).json({ success: true });
@@ -527,7 +524,6 @@ export const patchProfile = async (req, res, next) => {
     const variable = req.body;
 
     const user = await User.findById(req.id);
-
     if (!file) {
       if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
         s3.deleteObject(
@@ -576,15 +572,32 @@ export const patchProfile = async (req, res, next) => {
       variable.avatarUrl = file.key.split("/")[1];
     }
 
-    await User.findByIdAndUpdate(req.id, variable, {
-      returnNewDocument: true,
-      projection: { avatarUrl: 1, _id: 1, nickname: 1 },
+    const newUser = await User.findByIdAndUpdate(req.id, variable, {
+      new: true,
+      projection: { avatarUrl: 1, nickname: 1 },
     });
 
-    const newUser = await User.findById(req.id, {
-      nickname: 1,
-      avatarUrl: 1,
-    });
+    await Promise.all([
+      Review.updateMany(
+        { "writer._id": req.id },
+        {
+          $set: {
+            "writer.avatarUrl": newUser.avatarUrl,
+            "writer.nickname": newUser.nickname,
+          },
+        }
+      ),
+      Theater.updateMany(
+        {},
+        {
+          $set: {
+            "review.$[element].writer.nickname": newUser.nickname,
+            "review.$[element].writer.avatarUrl": newUser.avatarUrl,
+          },
+        },
+        { arrayFilters: [{ "element.writer._id": req.id }] }
+      ),
+    ]);
 
     res.status(200).json({ success: true, data: newUser });
   } catch (error) {
@@ -608,7 +621,12 @@ export const deleteUser = async (req, res, next) => {
       User.findByIdAndDelete(req.id),
       Review.updateMany(
         { "writer._id": req.id },
-        { writer: { nickname: "탈퇴 회원" } }
+        {
+          writer: {
+            nickname: "탈퇴 회원",
+            avatarUrl: "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg",
+          },
+        }
       ),
       Theater.updateMany(
         {},
