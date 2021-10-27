@@ -12,11 +12,14 @@ import {
   getProfile,
   patchProfile,
   getSeatList,
+  getSeatNum,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 import { upload } from "../middlewares/imageUpload";
 
 const userRouter = express.Router();
+
+userRouter.get("/num", getSeatNum);
 
 // third party access token 인증, jwt 생성
 userRouter.get(userRoutes.jwt, getJwt);

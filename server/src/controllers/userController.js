@@ -365,6 +365,22 @@ export const getProfile = async (req, res, next) => {
   }
 };
 
+export const getSeatNum = async (req, res, next) => {
+  try {
+    const { theaterName } = req.query;
+    const seat = await Seat.find({ theaterName });
+    console.log(seat.length);
+
+    const theater = await Theater.findOne({ name: theaterName });
+    theater.seatNumber = seat.length;
+    await theater.save();
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // post seat
 export const postSeat = async (req, res, next) => {
   try {
@@ -390,6 +406,7 @@ export const postSeat = async (req, res, next) => {
     });
 
     await Seat.insertMany(result);
+
     console.log("finished!!");
     console.log(result.length);
 
@@ -622,9 +639,9 @@ export const deleteUser = async (req, res, next) => {
       Review.updateMany(
         { "writer._id": req.id },
         {
-          writer: {
-            nickname: "탈퇴 회원",
-            avatarUrl: "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg",
+          $set: {
+            "writer.nickname": "탈퇴 회원",
+            "writer.avatarUrl": "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg",
           },
         }
       ),
