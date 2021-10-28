@@ -13,6 +13,8 @@ import {
   patchProfile,
   getSeatList,
   getSeatNum,
+  getPrivacy,
+  getPolicy,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 import { upload } from "../middlewares/imageUpload";
@@ -34,6 +36,10 @@ userRouter.get(userRoutes.logout, authJWT, getLogout);
 userRouter.get(userRoutes.activity, authJWT, getActivity);
 
 userRouter.get(userRoutes.profile, authJWT, getProfile);
+
+userRouter.get(userRoutes.privacy, getPrivacy);
+
+userRouter.get(userRoutes.policy, getPolicy);
 
 userRouter.patch(
   userRoutes.profile,

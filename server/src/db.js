@@ -6,7 +6,7 @@ dotenv.config();
 if (!process.env.DB_HOST) console.error("DB_HOST is required!!!");
 
 mongoose
-  .connect(process.env.DB_HOST, {
+  .connect(process.env.DB_HOST_TEST, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true,

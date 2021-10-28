@@ -17,6 +17,8 @@ const ACTIVITY = "/activity";
 const ACTIVITY_REVIEW = "/activity/review";
 
 const PROFILE = "/profile";
+const PRIVACY = "/privacy";
+const POLICY = "/policy";
 
 const userRoutes = {
   user: USER,
@@ -27,6 +29,8 @@ const userRoutes = {
   activity: ACTIVITY,
   activityReview: ACTIVITY_REVIEW,
   profile: PROFILE,
+  privacy: PRIVACY,
+  policy: POLICY,
 };
 
 export default userRoutes;
