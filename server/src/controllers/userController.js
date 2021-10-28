@@ -97,6 +97,7 @@ export const getRefresh = async (req, res, next) => {
 export const getJwt = async (req, res, next) => {
   try {
     const { provider } = req.query;
+    console.log("asd");
 
     if (provider !== "apple" && !req.headers.authorization) {
       return next(throwError(400, "header에 accessToken이 없습니다."));
@@ -372,6 +373,7 @@ export const getSeatNum = async (req, res, next) => {
     console.log(seat.length);
 
     const theater = await Theater.findOne({ name: theaterName });
+
     theater.seatNumber = seat.length;
     await theater.save();
 
@@ -418,9 +420,10 @@ export const postSeat = async (req, res, next) => {
 
 export const updateSeat = async (req, res, next) => {
   try {
-    // const { fcltynm } = req.query;
-
-    // await Show.deleteMany({ fcltynm });
+    await Theater.findOneAndUpdate(
+      { name: "봄날아트홀(구. 아리랑소극장) (1관(지하1층)" },
+      { location: "서울 종로구 동숭길 39 지하1층 봄날아트홀 " }
+    );
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);
