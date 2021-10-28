@@ -487,7 +487,6 @@ export const getRefresh = async (req, res, next) => {
 export const getJwt = async (req, res, next) => {
   try {
     const { provider } = req.query;
-    console.log("asd");
 
     if (provider !== "apple" && !req.headers.authorization) {
       return next(throwError(400, "header에 accessToken이 없습니다."));
@@ -542,12 +541,15 @@ export const getJwt = async (req, res, next) => {
       case "apple":
         try {
           const { idToken } = req.query;
-          console.log(idToken);
+          logger.info(`apple idToken: ${idToken}`);
 
           const json = jwt.decode(idToken, { complete: true });
+          logger.info(`apple json: ${json}`);
           const { kid } = json.header;
+          logger.info(`apple kid: ${kid}`);
 
           const appleKeys = await getAppleSigningKey(kid);
+          logger.info(`appleKeys: ${appleKeys}`);
           if (!appleKeys) {
             console.error("something went wrong");
             return;
