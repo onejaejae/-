@@ -751,6 +751,7 @@ export const getProfile = async (req, res, next) => {
       avatarUrl: 1,
       likeReviews: 1,
       scrapShows: 1,
+      writeReviews: 1,
     });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -985,7 +986,6 @@ export const patchProfile = async (req, res, next) => {
       variable.avatarUrl = file.key.split("/")[1];
     }
 
-    logger.info(`patchProfile updateVariable: ${variable}`);
     const newUser = await User.findByIdAndUpdate(req.id, variable, {
       new: true,
       projection: { avatarUrl: 1, nickname: 1 },

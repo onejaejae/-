@@ -14,10 +14,6 @@ export const getReviewDetail = async (req, res, next) => {
     }
 
     const review = await Review.findById(reviewId, {
-      likes: 0,
-      fcltynm: 0,
-      prfnm: 0,
-      casting: 0,
       createAt: 0,
       createdAt: 0,
       updatedAt: 0,
