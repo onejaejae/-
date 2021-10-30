@@ -35,7 +35,7 @@ let isDisableKeepAlive = false;
 // request entity too large 해결 위해
 app.use(
   express.json({
-    limit: "50mb",
+    limit: "100mb",
   })
 );
 
