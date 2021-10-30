@@ -16,6 +16,7 @@ import {
   getPrivacy,
   getPolicy,
   postProfile,
+  getNotice,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 import { upload } from "../middlewares/imageUpload";
@@ -41,6 +42,8 @@ userRouter.get(userRoutes.profile, authJWT, getProfile);
 userRouter.get(userRoutes.privacy, getPrivacy);
 
 userRouter.get(userRoutes.policy, getPolicy);
+
+userRouter.get(userRoutes.notice, getNotice);
 
 userRouter.post(
   userRoutes.profile,

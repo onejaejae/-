@@ -197,7 +197,7 @@ export const getPrivacy = (req, res, next) => {
     </ul>
   `;
 
-    res.send(html);
+    res.status(200).json({ success: true, data: html });
   } catch (error) {
     next(error);
   }
@@ -403,7 +403,16 @@ export const getPolicy = (req, res, next) => {
     <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:left;line-height:normal;font-size:13px;font-family:"맑은 고딕";'><span style="font-size:16px;font-family:굴림;">(</span><span style="font-size:16px;font-family:굴림;">시행일)&nbsp;이 약관은&nbsp;2021년 <span style="background:yellow;">0</span><span style="background:yellow;">월&nbsp;0일부터</span> 시행합니다</span></p>
     <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:justify;line-height:107%;font-size:13px;font-family:"맑은 고딕";'>&nbsp;</p>
   `;
-    res.send(html);
+    res.status(200).json({ success: true, data: html });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getNotice = (req, res, next) => {
+  try {
+    const html = [];
+    res.status(200).json({ success: true, data: html });
   } catch (error) {
     next(error);
   }
