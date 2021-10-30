@@ -14,10 +14,6 @@ const storage = multerS3({
 
 export const upload = multer({
   storage,
-  fileFilter: (req, file, cb) => {
-    if (["image/png", "image/jpeg"].includes(file.mimetype)) cb(null, true);
-    else cb(new Error("invalid file type"), false);
-  },
   limits: {
     fileSize: 1024 * 1024 * 5,
   },
