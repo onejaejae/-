@@ -1,6 +1,7 @@
 import multer from "multer";
 import mime from "mime-types";
 import multerS3 from "multer-s3";
+import logger from "../config/logger";
 import { s3 } from "../aws";
 
 const { v4: uuid } = require("uuid");

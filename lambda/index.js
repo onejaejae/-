@@ -19,6 +19,12 @@ exports.handler = async (event) => {
     const keyOnly = key.split("/")[1];
     console.log(`Image Resizing: ${keyOnly}`);
 
+    const ext = key.split(".")[key.split(".").length - 1].toLowerCase();
+    console.log(`ext: ${ext}`);
+
+    // 확장자가 jpg면 jpeg로 바꿔줘야한다.
+    const requiredFormat = ext === "jpg" ? "jpeg" : ext;
+
     const image = await s3
       .getObject({ Bucket: "bogobogo", Key: key })
       .promise();
@@ -27,9 +33,11 @@ exports.handler = async (event) => {
       transformationOptions.map(async ({ name, width }) => {
         try {
           const newKey = `${name}/${keyOnly}`;
+          console.log(`newKey: ${newKey}`);
           const resizedImage = await sharp(image.Body)
             .rotate()
             .resize({ width, height: width, fit: "outside" })
+            .toFormat(requiredFormat)
             .toBuffer();
 
           await s3

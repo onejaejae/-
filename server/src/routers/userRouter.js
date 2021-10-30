@@ -15,7 +15,6 @@ import {
   getSeatNum,
   getPrivacy,
   getPolicy,
-  postProfile,
   getNotice,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
@@ -44,13 +43,6 @@ userRouter.get(userRoutes.privacy, getPrivacy);
 userRouter.get(userRoutes.policy, getPolicy);
 
 userRouter.get(userRoutes.notice, getNotice);
-
-userRouter.post(
-  userRoutes.profile,
-  authJWT,
-  upload.single("image"),
-  postProfile
-);
 
 userRouter.patch(
   userRoutes.profile,
