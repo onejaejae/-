@@ -11,7 +11,6 @@ import userExist from "../utils/userExist";
 import { verify, sign, refresh, refreshVerify } from "../utils/jwt";
 import logger from "../config/logger";
 import Review from "../models/Review";
-import Show from "../models/Show";
 import { s3 } from "../aws";
 import Scrap from "../models/Scrap";
 
@@ -37,13 +36,7 @@ const getAppleSigningKey = (kid) => {
 
 export const getPrivacy = (req, res, next) => {
   try {
-    const html = `<!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>practice</title>
-    </head>
-    <body>
+    const html = `
     <p><strong>개인정보처리방침</strong></p>
     <p>본 방침은 2021년 11월 1일부터 적용됩니다.</p>
     <p>CURIOUSER가 운영하는 어플 &lt;보고보고&gt;(이하 &lt;보고보고&gt;)는 개인정보보호법에 따라 이용자의 개인정보 보호 및 권익을 보호하고 개인정보와 관련한 이용자의 고충을 원활하게 처리할 수 있도록 다음과 같은 처리 방침을 두고 있습니다.</p>
@@ -202,8 +195,7 @@ export const getPrivacy = (req, res, next) => {
         <li>위탁업무 : 데이터 보관 및 처리</li>
         <li>보유 및 이용기간: 회원탈퇴 시 혹은 위탁계약종료시까지</li>
     </ul>
-    </body>
-    </html>`;
+  `;
 
     res.send(html);
   } catch (error) {
@@ -214,13 +206,7 @@ export const getPrivacy = (req, res, next) => {
 export const getPolicy = (req, res, next) => {
   try {
     const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>practice</title>
-    </head>
-    <body>
+    
       <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:center;line-height:107%;font-size:13px;font-family:"맑은 고딕";'><strong><span style="font-size:19px;line-height:107%;">이용약관</span></strong></p>
     <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:left;line-height:normal;font-size:13px;font-family:"맑은 고딕";'><strong><span style="font-size:24px;font-family:굴림;">제1장 총칙</span></strong></p>
     <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:left;line-height:normal;font-size:13px;font-family:"맑은 고딕";'><strong><span style="font-size:18px;font-family:굴림;">제1조&nbsp;(목적)</span></strong></p>
@@ -416,9 +402,7 @@ export const getPolicy = (req, res, next) => {
     <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:left;line-height:normal;font-size:13px;font-family:"맑은 고딕";'><span style="font-size:16px;font-family:굴림;">부칙</span></p>
     <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:left;line-height:normal;font-size:13px;font-family:"맑은 고딕";'><span style="font-size:16px;font-family:굴림;">(</span><span style="font-size:16px;font-family:굴림;">시행일)&nbsp;이 약관은&nbsp;2021년 <span style="background:yellow;">0</span><span style="background:yellow;">월&nbsp;0일부터</span> 시행합니다</span></p>
     <p style='margin-top:0cm;margin-right:0cm;margin-bottom:8.0pt;margin-left:0cm;text-align:justify;line-height:107%;font-size:13px;font-family:"맑은 고딕";'>&nbsp;</p>
-    </body>
-    </html>
-    `;
+  `;
     res.send(html);
   } catch (error) {
     next(error);
@@ -582,9 +566,6 @@ export const getJwt = async (req, res, next) => {
 
       default:
         return next(throwError(400, "잘못된 provider입니다."));
-    }
-    if (Tokendata.status !== 200) {
-      return next(throwError(400, "토큰이 유효하지 않습니다."));
     }
 
     switch (provider) {
@@ -751,7 +732,7 @@ export const getProfile = async (req, res, next) => {
       avatarUrl: 1,
       likeReviews: 1,
       scrapShows: 1,
-      writeReviews: 1,
+      2: 1,
     });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -813,48 +794,11 @@ export const postSeat = async (req, res, next) => {
 
 export const updateSeat = async (req, res, next) => {
   try {
-    await Theater.findOneAndUpdate(
-      { name: "봄날아트홀(구. 아리랑소극장) (1관(지하1층)" },
-      { location: "서울 종로구 동숭길 39 지하1층 봄날아트홀 " }
-    );
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }
 };
-
-// export const postSeat = async (req, res, next) => {
-//   try {
-//     const obj = {
-//       floor: "1층",
-//     };
-
-//     req.body.data.forEach((data) => {
-//       data.forEach(async (data2) => {
-//         delete data2.color;
-//         console.log(data2);
-
-//         const col = data2.column;
-//         obj[`${col}`] = [];
-//         // seat.index.push(data2.index);
-//       });
-//     });
-
-//     req.body.data.forEach((data) => {
-//       data.forEach(async (data2) => {
-//         delete data2.color;
-
-//         const col = data2.column;
-//         obj[`${col}`].push(data2.index);
-//         // seat.index.push(data2.index);
-//       });
-//     });
-
-//     res.status(200).json({ success: true, obj });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 export const getSeat = async (req, res, next) => {
   try {
