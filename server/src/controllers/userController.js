@@ -963,6 +963,94 @@ export const patchProfile = async (req, res, next) => {
   }
 };
 
+export const postProfile = async (req, res, next) => {
+  try {
+    const { file } = req;
+    const variable = req.body;
+
+    logger.info(`patchProfile file: ${file}`);
+    const user = await User.findById(req.id);
+    if (!file) {
+      if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
+        s3.deleteObject(
+          { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
+          (error) => {
+            if (error) throw error;
+          }
+        );
+        s3.deleteObject(
+          { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
+          (error) => {
+            if (error) throw error;
+          }
+        );
+        s3.deleteObject(
+          { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
+          (error) => {
+            if (error) throw error;
+          }
+        );
+        variable.avatarUrl = "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg";
+      }
+    } else if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
+        (error) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w140/${user.avatarUrl}` },
+        (error) => {
+          if (error) throw error;
+        }
+      );
+      s3.deleteObject(
+        { Bucket: "bogobogo", Key: `w600/${user.avatarUrl}` },
+        (error) => {
+          if (error) throw error;
+        }
+      );
+      // eslint-disable-next-line prefer-destructuring
+      variable.avatarUrl = file.key.split("/")[1];
+    } else {
+      // eslint-disable-next-line prefer-destructuring
+      variable.avatarUrl = file.key.split("/")[1];
+    }
+
+    const newUser = await User.findByIdAndUpdate(req.id, variable, {
+      new: true,
+      projection: { avatarUrl: 1, nickname: 1 },
+    });
+
+    await Promise.all([
+      Review.updateMany(
+        { "writer._id": req.id },
+        {
+          $set: {
+            "writer.avatarUrl": newUser.avatarUrl,
+            "writer.nickname": newUser.nickname,
+          },
+        }
+      ),
+      Theater.updateMany(
+        {},
+        {
+          $set: {
+            "review.$[element].writer.nickname": newUser.nickname,
+            "review.$[element].writer.avatarUrl": newUser.avatarUrl,
+          },
+        },
+        { arrayFilters: [{ "element.writer._id": req.id }] }
+      ),
+    ]);
+
+    res.status(200).json({ success: true, data: newUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteUser = async (req, res, next) => {
   try {
     const [user, like] = await Promise.all([
