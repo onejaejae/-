@@ -968,7 +968,7 @@ export const postProfile = async (req, res, next) => {
     const { file } = req;
     const variable = req.body;
 
-    logger.info(`patchProfile file: ${file}`);
+    logger.info(`postProfile file: ${file}`);
     const user = await User.findById(req.id);
     if (!file) {
       if (user.avatarUrl !== "ee3e6ef5-6359-40a0-9dbd-cc6a6bb91a78.jpeg") {
