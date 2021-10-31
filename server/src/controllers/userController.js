@@ -17,7 +17,7 @@ import Scrap from "../models/Scrap";
 const { FACEBOOK_ID } = process.env;
 
 const client = jwksClient({
-  jwksUri: "https://sandrino.auth0.com/.well-known/jwks.json",
+  jwksUri: "https://appleid.apple.com/auth/keys",
 });
 
 const getAppleSigningKey = (kid) => {
