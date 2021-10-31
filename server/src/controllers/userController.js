@@ -887,7 +887,7 @@ export const getSeatList = async (req, res, next) => {
 export const patchProfile = async (req, res, next) => {
   try {
     const { file } = req;
-    console.log(file);
+    // console.log(file);
     const { reset } = req.query;
     const variable = req.body;
 
@@ -917,9 +917,9 @@ export const patchProfile = async (req, res, next) => {
           if (error) throw error;
         }
       );
-      variable.avatarUrl = "b98710b2-2216-4f88-bde0-05f0792dfd4f.jpeg";
+      variable.avatarUrl = "902e5693-e0bb-4097-8ab5-b81a71003fe4.jpg";
     } else if (file) {
-      if (user.avatarUrl !== "b98710b2-2216-4f88-bde0-05f0792dfd4f.jpeg") {
+      if (user.avatarUrl !== "902e5693-e0bb-4097-8ab5-b81a71003fe4.jpg") {
         s3.deleteObject(
           { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
           (error) => {
@@ -995,7 +995,7 @@ export const deleteUser = async (req, res, next) => {
         {
           $set: {
             "writer.nickname": "탈퇴 회원",
-            "writer.avatarUrl": "b98710b2-2216-4f88-bde0-05f0792dfd4f.jpeg",
+            "writer.avatarUrl": "902e5693-e0bb-4097-8ab5-b81a71003fe4.jpg",
           },
         }
       ),
@@ -1004,7 +1004,7 @@ export const deleteUser = async (req, res, next) => {
         {
           "review.$[element].writer.nickname": "탈퇴 회원",
           "review.$[element].writer.avatarUrl":
-            "b98710b2-2216-4f88-bde0-05f0792dfd4f.jpeg",
+            "902e5693-e0bb-4097-8ab5-b81a71003fe4.jpg",
         },
         { arrayFilters: [{ "element.writer._id": req.id }] }
       ),
@@ -1016,7 +1016,7 @@ export const deleteUser = async (req, res, next) => {
       Scrap.deleteMany({ userId: req.id }),
     ]);
 
-    if (user.avatarUrl !== "b98710b2-2216-4f88-bde0-05f0792dfd4f.jpeg") {
+    if (user.avatarUrl !== "902e5693-e0bb-4097-8ab5-b81a71003fe4.jpg") {
       s3.deleteObject(
         { Bucket: "bogobogo", Key: `raw/${user.avatarUrl}` },
         (error) => {

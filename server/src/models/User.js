@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
 
     avatarUrl: {
       type: String,
-      default: "b98710b2-2216-4f88-bde0-05f0792dfd4f.jpeg",
+      default: "902e5693-e0bb-4097-8ab5-b81a71003fe4.jpg",
     },
 
     likeReviews: [{ type: mongoose.Types.ObjectId }],
