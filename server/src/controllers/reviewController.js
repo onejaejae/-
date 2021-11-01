@@ -122,7 +122,7 @@ export const deleteReview = async (req, res, next) => {
           fcltynm: theater.name,
           _id: { $lt: theater.review[0].id },
         }).sort({ _id: -1 });
-        console.log(newReview);
+
         if (newReview && newReview.id !== reviewId)
           theater.review.unshift(newReview);
       }

@@ -411,7 +411,32 @@ export const getPolicy = (req, res, next) => {
 
 export const getNotice = (req, res, next) => {
   try {
-    const html = [];
+    const html = [
+      `<p>[공지] 보고보고를 찾아주신 모든 관객 여러분들 환영합니다!&nbsp;</p>
+    <p><br></p>
+    <p>안녕하세요,&nbsp;</p>
+    <p>팀 Curiouser입니다.&nbsp;</p>
+    <p><br></p>
+    <p>&lt;보고보고&gt;에 찾아와주셔서 진심으로 감사합니다!&nbsp;</p>
+    <p><br></p>
+    <p>&lt;보고보고&gt;는 관객 여러분들께서 공연에 대한 정보를 누구나 쉽게 찾고 공유하실 수 있는 공간입니다.&nbsp;</p>
+    <p><br></p>
+    <p>저희는 이 공간을 더욱 가꾸어나갈 예정입니다.&nbsp;</p>
+    <p>공연 리뷰를 작성하고 보실 수 있는 공간이자,</p>
+    <p>극단들이 관객 여러분들과 소통하실 수 있는 공간이자,</p>
+    <p>주변 지역이 함께 성장할 수 있는 기반이 되는 공간으로 만들고자 하는 목표가 있습니다.&nbsp;</p>
+    <p><br></p>
+    <p>이 공간을 가꾸어 나가는 데에 무엇보다 가장 힘이 되는 것은 이용자 여러분들입니다. 여러분들의 소중한 경험은 또 다른 관객의 선택에 큰 도움이 될 것입니다. 꼬리에 꼬리를 무는 이 도움은 더 많은 사람들이 공연을 사랑할 수밖에 없는 이유가 될 것이라 생각합니다.&nbsp;</p>
+    <p><br></p>
+    <p>현재는 초반 베타 서비스 기간으로 공연 리뷰와 관련된 서비스를 우선적으로 제공하고 있습니다. 각 분야의 전문가들은 아니지만 지속적으로 양질의 서비스를 제공할 수 있도록 차근차근 노력하겠습니다. 본 어플을 이용하시며 궁금한 점이나 불편한 점, 혹은 피드백이 있으시다면 아래의 창구를 통해 연락 주시면 최대한 빠르고 성실히 답변 드리도록 하겠습니다.&nbsp;</p>
+    <p><br></p>
+    <p>이 공간의 주인공은 여러분들이니,&nbsp;</p>
+    <p>편히 마음껏 즐기고 가실 수 있길 진심으로 희망합니다.</p>
+    <p><br></p>
+    <p>&bull;contact</p>
+    <p>&nbsp; &nbsp;- mail : curiouser2021@gmail.com&nbsp;</p>
+    <p>- twitter : @bogobogo_app</p>`,
+    ];
     res.status(200).json({ success: true, data: html });
   } catch (error) {
     next(error);
@@ -534,15 +559,12 @@ export const getJwt = async (req, res, next) => {
       case "apple":
         try {
           const { idToken } = req.query;
-          logger.info(`apple idToken: ${idToken}`);
 
           const json = jwt.decode(idToken, { complete: true });
-          logger.info(`apple json: ${json}`);
           const { kid } = json.header;
-          logger.info(`apple kid: ${kid}`);
 
           const appleKeys = await getAppleSigningKey(kid);
-          logger.info(`appleKeys: ${appleKeys}`);
+
           if (!appleKeys) {
             console.error("something went wrong");
             return;
@@ -887,14 +909,8 @@ export const getSeatList = async (req, res, next) => {
 export const patchProfile = async (req, res, next) => {
   try {
     const { file } = req;
-    // console.log(file);
     const { reset } = req.query;
     const variable = req.body;
-
-    if (file) {
-      logger.info(`patchProfile file mimetype: ${file.mimetype}`);
-      logger.info(`patchProfile file mimetype: ${file.key}`);
-    }
 
     const user = await User.findById(req.id);
 

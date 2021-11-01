@@ -1,7 +1,5 @@
 import multer from "multer";
-import mime from "mime-types";
 import multerS3 from "multer-s3";
-import logger from "../config/logger";
 import { s3 } from "../aws";
 
 const { v4: uuid } = require("uuid");
@@ -11,7 +9,7 @@ const storage = multerS3({
   bucket: "bogobogo",
   key: (req, file, cb) => {
     let mimeType;
-    logger.info(`middleware file.mimetype: ${file.mimetype}`);
+
     switch (file.mimetype) {
       case "image/jpeg":
         mimeType = "jpg";
@@ -29,7 +27,7 @@ const storage = multerS3({
         mimeType = "jpg";
         break;
     }
-    logger.info(`middleware mimeType: ${mimeType}`);
+
     cb(null, `raw/${uuid()}.${mimeType}`);
   },
 });

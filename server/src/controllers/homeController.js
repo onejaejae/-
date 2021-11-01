@@ -382,7 +382,7 @@ export const getSearchTheater = async (req, res, next) => {
 export const getReviewList = async (req, res, next) => {
   try {
     const { sort } = req.query;
-    console.log(sort);
+
     if (sort !== "latest" && sort !== "like") {
       return next(throwError(400, "sort가 잘못되었습니다."));
     }

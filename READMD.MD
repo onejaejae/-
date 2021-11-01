@@ -128,3 +128,20 @@ mongorestore --uri "mongodb+srv://bogo:PnDlsMx8MvsCP1FC@cluster0.5gwfw.mongodb.n
 https://velog.io/@hopsprings2/%EA%B2%AC%EA%B3%A0%ED%95%9C-node.js-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90-%EC%84%A4%EA%B3%84%ED%95%98%EA%B8%B0
 
 https://darrengwon.tistory.com/1273
+
+<br>
+
+### cloudFront 캐시 무효화 Issue
+---
+
+<br>
+
+https://kiwinam.com/posts/42/remove-cache-cloud-front/
+
+
+### multer 확장자 처리 Issue
+---
+
+<br>
+
+https://hyogeun-android.tistory.com/entry/9-Nodejs-Multer-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%97%85%EB%A1%9C%EB%93%9C
