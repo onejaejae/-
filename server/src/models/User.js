@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
     scrapShows: [{ type: mongoose.Types.ObjectId }],
     writeReviews: [{ type: mongoose.Types.ObjectId }],
 
-    appleId: String,
+    appleId: Number,
     kakaoId: Number,
     facebookId: Number,
     googleId: Number,

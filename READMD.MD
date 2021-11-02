@@ -145,3 +145,16 @@ https://kiwinam.com/posts/42/remove-cache-cloud-front/
 <br>
 
 https://hyogeun-android.tistory.com/entry/9-Nodejs-Multer-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%97%85%EB%A1%9C%EB%93%9C
+
+
+---
+
+### traffic 몰릴 시 고려해 볼 것
+
+<br>
+
+https://www.youtube.com/watch?v=_1Yqk-fLkec
+
+https://www.youtube.com/watch?v=s9FHdj6jd_U&t=50
+
+https://www.youtube.com/watch?v=z68l2X5KoC4

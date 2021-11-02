@@ -570,8 +570,9 @@ export const getJwt = async (req, res, next) => {
             return;
           }
 
-          userObj.appleId = idToken;
+          userObj.appleId = parseInt(Math.random() * 1000000000000000000);
           user = await userExist(userObj);
+          logger.info(`apple user: ${user}`);
 
           if (!user) {
             user = await User.create({
