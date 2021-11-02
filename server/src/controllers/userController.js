@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import jwtDecode from "jwt-decode";
 import jwksClient from "jwks-rsa";
 import redisClient from "../utils/redis";
 import throwError from "../utils/throwError";
@@ -562,7 +563,6 @@ export const getJwt = async (req, res, next) => {
 
           const json = jwt.decode(idToken, { complete: true });
           const { kid } = json.header;
-
           const appleKeys = await getAppleSigningKey(kid);
 
           if (!appleKeys) {
@@ -570,9 +570,12 @@ export const getJwt = async (req, res, next) => {
             return;
           }
 
-          userObj.appleId = parseInt(Math.random() * 1000000000000000000);
+          const decoded = jwtDecode(idToken);
+          logger.info(`decoded ${decoded}`);
+          console.log("decoded", decoded);
+
+          userObj.appleId = idToken;
           user = await userExist(userObj);
-          logger.info(`apple user: ${user}`);
 
           if (!user) {
             user = await User.create({
