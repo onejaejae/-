@@ -571,7 +571,6 @@ export const getJwt = async (req, res, next) => {
           }
 
           const decoded = jwtDecode(idToken);
-          console.log("decoded:", decoded);
 
           userObj.appleId = decoded.sub;
           user = await userExist(userObj);
