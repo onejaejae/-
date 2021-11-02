@@ -571,16 +571,15 @@ export const getJwt = async (req, res, next) => {
           }
 
           const decoded = jwtDecode(idToken);
-          logger.info(`decoded ${decoded}`);
-          console.log("decoded", decoded);
+          console.log("decoded:", decoded);
 
-          userObj.appleId = idToken;
+          userObj.appleId = decoded.sub;
           user = await userExist(userObj);
 
           if (!user) {
             user = await User.create({
               nickname: `포도알${parseInt(Math.random() * 100000)}`,
-              appleId: idToken,
+              appleId: decoded.sub,
             });
           }
 
