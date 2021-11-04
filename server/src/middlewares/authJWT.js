@@ -17,7 +17,7 @@ const authJWT = (req, res, next) => {
       });
     }
   } else {
-    return res.status(400).json({
+    return res.status(401).json({
       success: false,
       message: "header에 accessToken이 없습니다.",
     });

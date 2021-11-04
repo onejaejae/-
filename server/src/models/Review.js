@@ -97,6 +97,12 @@ export const reviewSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    // 신고 수
+    reportNumber: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

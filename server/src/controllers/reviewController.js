@@ -92,6 +92,76 @@ export const patchReview = async (req, res, next) => {
   }
 };
 
+export const patchLike = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+
+    const like = new Like({ userId: req.id, reviewId });
+
+    await Promise.all([
+      like.save(),
+      Review.findByIdAndUpdate(
+        reviewId,
+        {
+          $inc: { likeNumber: 1 },
+        },
+        { new: true }
+      ),
+      User.findByIdAndUpdate(req.id, {
+        $addToSet: { likeReviews: reviewId },
+      }),
+    ]);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchUnlike = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+
+    await Promise.all([
+      Like.findOneAndDelete({ reviewId }),
+      Review.findByIdAndUpdate(
+        reviewId,
+        {
+          $inc: { likeNumber: -1 },
+        },
+        { new: true }
+      ),
+      User.findByIdAndUpdate(req.id, {
+        $pull: { likeReviews: reviewId },
+      }),
+    ]);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchReport = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return next(throwError(400, "reviewId가 유효하지 않습니다."));
+    }
+
+    await Review.findByIdAndUpdate(reviewId, { $inc: { reportNumber: 1 } });
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteReview = async (req, res, next) => {
   try {
     const { reviewId } = req.params;
@@ -143,62 +213,6 @@ export const deleteReview = async (req, res, next) => {
       }),
       User.updateMany({}, { $pull: { likeReviews: reviewId } }),
       Like.deleteMany({ reviewId }),
-    ]);
-
-    res.status(200).json({ success: true });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const patchLike = async (req, res, next) => {
-  try {
-    const { reviewId } = req.params;
-    if (!mongoose.isValidObjectId(reviewId)) {
-      return next(throwError(400, "reviewId가 유효하지 않습니다."));
-    }
-
-    const like = new Like({ userId: req.id, reviewId });
-
-    await Promise.all([
-      like.save(),
-      Review.findByIdAndUpdate(
-        reviewId,
-        {
-          $inc: { likeNumber: 1 },
-        },
-        { new: true }
-      ),
-      User.findByIdAndUpdate(req.id, {
-        $addToSet: { likeReviews: reviewId },
-      }),
-    ]);
-
-    res.status(200).json({ success: true });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const patchUnlike = async (req, res, next) => {
-  try {
-    const { reviewId } = req.params;
-    if (!mongoose.isValidObjectId(reviewId)) {
-      return next(throwError(400, "reviewId가 유효하지 않습니다."));
-    }
-
-    await Promise.all([
-      Like.findOneAndDelete({ reviewId }),
-      Review.findByIdAndUpdate(
-        reviewId,
-        {
-          $inc: { likeNumber: -1 },
-        },
-        { new: true }
-      ),
-      User.findByIdAndUpdate(req.id, {
-        $pull: { likeReviews: reviewId },
-      }),
     ]);
 
     res.status(200).json({ success: true });

@@ -10,8 +10,8 @@ import {
 const theaterRouter = express.Router();
 
 // 극장 리스트
-theaterRouter.get("/", authJWT, getTheater);
-theaterRouter.get(theaterRoutes.review, authJWT, getReview);
-theaterRouter.get("/:theaterId", authJWT, getTheaterDetail);
+theaterRouter.get("/", getTheater);
+theaterRouter.get(theaterRoutes.review, getReview);
+theaterRouter.get("/:theaterId", getTheaterDetail);
 
 export default theaterRouter;
