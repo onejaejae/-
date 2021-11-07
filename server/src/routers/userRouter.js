@@ -16,6 +16,8 @@ import {
   getPrivacy,
   getPolicy,
   getNotice,
+  patchBlock,
+  patchUnblock,
 } from "../controllers/userController";
 import authJWT from "../middlewares/authJWT";
 import { upload } from "../middlewares/imageUpload";
@@ -50,6 +52,9 @@ userRouter.patch(
   upload.single("image"),
   patchProfile
 );
+
+userRouter.patch("/:userId/block", authJWT, patchBlock);
+userRouter.patch("/:userId/unblock", authJWT, patchUnblock);
 
 userRouter.delete("/", authJWT, deleteUser);
 

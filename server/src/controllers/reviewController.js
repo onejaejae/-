@@ -155,7 +155,13 @@ export const patchReport = async (req, res, next) => {
       return next(throwError(400, "reviewId가 유효하지 않습니다."));
     }
 
-    await Review.findByIdAndUpdate(reviewId, { $inc: { reportNumber: 1 } });
+    await Promise.all([
+      Review.findByIdAndUpdate(reviewId, { $inc: { reportNumber: 1 } }),
+      User.findByIdAndUpdate(req.id, {
+        $addToSet: { reportReviews: reviewId },
+      }),
+    ]);
+
     res.status(200).json({ success: true });
   } catch (error) {
     next(error);

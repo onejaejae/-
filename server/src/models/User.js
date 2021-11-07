@@ -16,6 +16,8 @@ const userSchema = new mongoose.Schema(
     likeReviews: [{ type: mongoose.Types.ObjectId }],
     scrapShows: [{ type: mongoose.Types.ObjectId }],
     writeReviews: [{ type: mongoose.Types.ObjectId }],
+    reportReviews: [{ type: mongoose.Types.ObjectId }],
+    blockUsers: [{ type: mongoose.Types.ObjectId }],
 
     appleId: String,
     kakaoId: Number,

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import jwtDecode from "jwt-decode";
 import jwksClient from "jwks-rsa";
 import redisClient from "../utils/redis";
@@ -766,6 +767,8 @@ export const getProfile = async (req, res, next) => {
       likeReviews: 1,
       scrapShows: 1,
       writeReviews: 1,
+      reportReviews: 1,
+      blockUsers: 1,
     });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -989,6 +992,35 @@ export const patchProfile = async (req, res, next) => {
     ]);
 
     res.status(200).json({ success: true, data: newUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchBlock = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!mongoose.isValidObjectId(userId)) {
+      return next(throwError(400, "userId가 유효하지 않습니다."));
+    }
+
+    await User.findByIdAndUpdate(req.id, { $addToSet: { blockUsers: userId } });
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchUnblock = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!mongoose.isValidObjectId(userId)) {
+      return next(throwError(400, "userId가 유효하지 않습니다."));
+    }
+
+    await User.findByIdAndUpdate(req.id, { $pull: { blockUsers: userId } });
+    res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }
