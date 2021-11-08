@@ -776,6 +776,19 @@ export const getProfile = async (req, res, next) => {
   }
 };
 
+export const getBlock = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.id, {
+      blockUsers: 1,
+      _id: 0,
+    }).populate("blockUsers", "nickname");
+
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getSeatNum = async (req, res, next) => {
   try {
     const { theaterName } = req.query;
