@@ -905,14 +905,9 @@ export const getBlock = async (req, res, next) => {
 
 export const getSeatNum = async (req, res, next) => {
   try {
-    const { theaterName } = req.query;
-    const seat = await Seat.find({ theaterName });
-    console.log(seat.length);
+    const { theaterArr } = req.body;
 
-    const theater = await Theater.findOne({ name: theaterName });
-
-    theater.seatNumber = seat.length;
-    await theater.save();
+    await Theater.insertMany(theaterArr);
 
     res.status(200).json({ success: true });
   } catch (error) {
