@@ -23,5 +23,6 @@ module.exports = {
     "no-dupe-keys": "off",
     "no-nested-ternary": "off",
     "no-plusplus": "off",
+    "no-restricted-syntax": "off",
   },
 };
