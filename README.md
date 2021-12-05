@@ -114,7 +114,7 @@
 
 <br>
 
-📌 API 명세서: `https://documenter.getpostman.com/view/13091019/U16kr58K`
+📌 API 명세서 (https://documenter.getpostman.com/view/13091019/U16kr58K)
 
 <br>
 
@@ -200,7 +200,7 @@
 
 <br>
 
-참고 자료 `https://engineering.linecorp.com/ko/blog/pm2-nodejs/`
+참고 자료 (https://engineering.linecorp.com/ko/blog/pm2-nodejs/)
 
 <br>
 
@@ -227,7 +227,7 @@
 
 <br>
 
-참고자료 `https://www.inflearn.com/course/%EC%9D%B4%EB%AF%B8%EC%A7%80-%EA%B4%80%EB%A6%AC-%ED%92%80%EC%8A%A4%ED%83%9D#`
+참고자료 (https://www.inflearn.com/course/%EC%9D%B4%EB%AF%B8%EC%A7%80-%EA%B4%80%EB%A6%AC-%ED%92%80%EC%8A%A4%ED%83%9D#)
 
 <br>
 
