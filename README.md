@@ -16,6 +16,35 @@
 
 <br>
 
+### 기술스택
+---
+
+<br>
+
+✔ Backend 
+
+- `Node.js`
+
+- `Express`
+
+<br>
+
+✔ DB 
+
+- `MongoDB`
+
+- `redis`
+
+<br>
+
+✔ DevOps 
+
+- `Docker`
+
+- `AWS- EC2, S3, lambda, cloudfront`
+         
+<br>
+
 ### 1. DATABASE
 
 ---
