@@ -143,7 +143,6 @@
 
 <br>
 
-📌 API 명세서 (https://documenter.getpostman.com/view/13091019/U16kr58K)
 
 <br>
 
