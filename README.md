@@ -182,7 +182,7 @@
 
 <br>
 
-### 4.2 Pagenation
+### 4.2 Pagination
 
 ---
 
